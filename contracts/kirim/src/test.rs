@@ -314,3 +314,48 @@ fn test_disbursement_auth_verified() {
     let (auth_address, _) = auths.get(0).unwrap();
     assert_eq!(auth_address, &sender);
 }
+
+#[test]
+#[should_panic]
+fn test_disbursement_insufficient_balance() {
+    let env = Env::default();
+    let (client, admin, token_id, _, token_admin_client) = setup_test(&env);
+    client.initialize(&admin, &token_id);
+
+    let sender = Address::generate(&env);
+    let r1 = Address::generate(&env);
+    let mint_amount = 50i128;
+    let total_amount = 100i128;
+    token_admin_client.mint(&sender, &mint_amount);
+
+    let mut recipients = Vec::new(&env);
+    recipients.push_back(RecipientShare { recipient: r1, percentage: 10000, amount: 0 });
+
+    client.create_and_execute_disbursement(&sender, &total_amount, &recipients);
+}
+
+#[test]
+fn test_disbursement_split_60_30_10() {
+    let env = Env::default();
+    let (client, admin, token_id, token_client, token_admin_client) = setup_test(&env);
+    client.initialize(&admin, &token_id);
+
+    let sender = Address::generate(&env);
+    let r1 = Address::generate(&env);
+    let r2 = Address::generate(&env);
+    let r3 = Address::generate(&env);
+    let total_amount = 1000i128;
+    token_admin_client.mint(&sender, &total_amount);
+
+    let mut recipients = Vec::new(&env);
+    recipients.push_back(RecipientShare { recipient: r1.clone(), percentage: 6000, amount: 0 });
+    recipients.push_back(RecipientShare { recipient: r2.clone(), percentage: 3000, amount: 0 });
+    recipients.push_back(RecipientShare { recipient: r3.clone(), percentage: 1000, amount: 0 });
+
+    client.create_and_execute_disbursement(&sender, &total_amount, &recipients);
+
+    assert_eq!(token_client.balance(&r1), 600);
+    assert_eq!(token_client.balance(&r2), 300);
+    assert_eq!(token_client.balance(&r3), 100);
+    assert_eq!(token_client.balance(&sender), 0);
+}

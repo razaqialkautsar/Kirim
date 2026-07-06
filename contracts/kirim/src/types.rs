@@ -1,4 +1,3 @@
-
 use soroban_sdk::{contracterror, contracttype, Address, Vec};
 
 #[contracttype]
