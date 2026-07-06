@@ -24,6 +24,8 @@ const ACCOUNTS_TO_CREATE = [
   { label: "receiver-1", initialTESTUSD: "100" },
   { label: "receiver-2", initialTESTUSD: "100" },
   { label: "receiver-3", initialTESTUSD: "100" },
+  { label: "receiver-4", initialTESTUSD: "100" },
+  { label: "receiver-5", initialTESTUSD: "100" },
 ];
 
 async function main() {

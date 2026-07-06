@@ -2,6 +2,9 @@ import "dotenv/config";
 import express from "express";
 import walletRouter from "./routes/wallet.route.js";
 import transactionRouter from "./routes/transaction.route.js";
+import onrampRouter from "./routes/onramp.route.js";
+import sep24Router from "./routes/sep24.route.js";
+import dashboardRouter from "./routes/dashboard.route.js";
 
 const app = express();
 const PORT = process.env.PORT ?? 3001;
@@ -32,6 +35,9 @@ app.get("/health", (_req, res) => {
 
 app.use("/api/wallets", walletRouter);
 app.use("/api/transactions", transactionRouter);
+app.use("/api/onramp", onrampRouter);
+app.use("/", sep24Router); // /.well-known/stellar.toml, /sep24/*, /api/offramp/*
+app.use("/api/dashboard", dashboardRouter);
 
 // Handler untuk route yang tidak ditemukan
 app.use((_req, res) => {
@@ -45,5 +51,9 @@ app.listen(PORT, () => {
   console.log(`\n🚀 Kirim Backend berjalan di http://localhost:${PORT}`);
   console.log(`   Health check: http://localhost:${PORT}/health`);
   console.log(`   Wallets:      http://localhost:${PORT}/api/wallets`);
-  console.log(`   Transactions: http://localhost:${PORT}/api/transactions\n`);
+  console.log(`   Transactions: http://localhost:${PORT}/api/transactions`);
+  console.log(`   On-Ramp:      http://localhost:${PORT}/api/onramp`);
+  console.log(`   Off-Ramp:     http://localhost:${PORT}/api/offramp/submit-bank`);
+  console.log(`   Dashboard:    http://localhost:${PORT}/api/dashboard`);
+  console.log(`   Stellar TOML: http://localhost:${PORT}/.well-known/stellar.toml\n`);
 });

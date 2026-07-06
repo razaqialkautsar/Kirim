@@ -74,11 +74,11 @@ pakai hasilnya, tidak perlu mengulang dari nol:
 
 Interface smart contract yang harus dipanggil (detail lengkap di `SMART_CONTRACT_SPEC.md`):
 `create_disbursement(sender, total_amount, asset, recipients)` lalu `execute_disbursement(disbursement_id)`.
+*(Catatan penting: Sangat disarankan berkoordinasi dengan tim SC agar 2 fungsi ini digabung menjadi 1 fungsi `create_and_execute` agar backend hanya butuh 1 kali pemanggilan).*
 
 - [ ] Endpoint `POST /api/transactions/send`
   - Input: `{ senderId, recipients: [{ receiverId, percentageBps }], totalAmount }`
-  - Validasi: total `percentageBps` harus tepat 10000, jumlah recipients sesuai batas max yang
-    disepakati dengan tim smart contract (lihat `SMART_CONTRACT_SPEC.md` untuk angka finalnya)
+  - Validasi: total `percentageBps` harus tepat 10000, jumlah recipients **maksimal 5** (sesuai `SMART_CONTRACT_SPEC.md`)
   - Convert `senderId`/`receiverId` (internal UUID) → `stellar_public_key` dari tabel `stellar_wallets`
   - Decrypt secret key sender di memory sementara (jangan log/simpan hasil decrypt)
   - Build & sign transaction yang memanggil `create_disbursement` lalu `execute_disbursement`
@@ -123,7 +123,7 @@ Interface smart contract yang harus dipanggil (detail lengkap di `SMART_CONTRACT
   - Input: `{ userId, amountMYR }`
   - Simulasikan konversi MYR → TESTUSD dengan kurs statis/mock (dokumentasikan asumsi kursnya)
   - Kirim TESTUSD dari distributor ke wallet user (pakai payment operation biasa, bukan smart contract)
-- [ ] Implementasi flow SEP-24 dasar untuk withdraw (off-ramp):
+- [ ] Implementasi flow SEP-24 dasar untuk withdraw (off-ramp simulasi ke **IDR/Rupiah**):
   - `GET /.well-known/stellar.toml` — metadata anchor (wajib ada sesuai spec SEP-24)
   - `POST /sep24/transactions/withdraw/interactive` — mulai flow withdraw, kembalikan URL interaktif
   - `GET /sep24/transaction?id=...` — cek status transaksi withdraw
@@ -163,7 +163,7 @@ Interface smart contract yang harus dipanggil (detail lengkap di `SMART_CONTRACT
 ## 6. Dashboard & History
 
 - [ ] Endpoint `GET /api/dashboard/:userId`
-  - Return gabungan: riwayat transaksi (kirim & terima), kurs yang dipakai, biaya, dan
+  - Return gabungan: riwayat transaksi (pengirim melihat MYR, penerima melihat IDR), kurs konversi, biaya, dan
     akumulasi yield (jika ada posisi di `savings_positions`)
   - Sertakan perbandingan biaya vs rata-rata bank tradisional (4.80%, data dari PRD Appendix)
     untuk ditampilkan sebagai fitur diferensiasi di UI
