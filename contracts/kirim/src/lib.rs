@@ -141,6 +141,17 @@ impl KirimContract {
         // Simpan ke persistent storage
         env.storage().persistent().set(&DataKey::Disbursement(current_id), &disbursement);
 
+        // Update list disbursement milik sender
+        let mut sender_disbursements: Vec<u64> = env
+            .storage()
+            .persistent()
+            .get(&DataKey::SenderDisbursements(sender.clone()))
+            .unwrap_or(Vec::new(&env));
+        sender_disbursements.push_back(current_id);
+        env.storage()
+            .persistent()
+            .set(&DataKey::SenderDisbursements(sender.clone()), &sender_disbursements);
+
         // Emit events
         DisbursementCreated {
             id: current_id,
@@ -155,5 +166,21 @@ impl KirimContract {
         .publish(&env);
 
         Ok(current_id)
+    }
+
+    /// Membaca data Disbursement berdasarkan ID
+    pub fn get_disbursement(env: Env, id: u64) -> Result<Disbursement, ContractError> {
+        env.storage()
+            .persistent()
+            .get(&DataKey::Disbursement(id))
+            .ok_or(ContractError::DisbursementNotFound)
+    }
+
+    /// Membaca semua ID Disbursement milik sender tertentu
+    pub fn get_disbursements_by_sender(env: Env, sender: Address) -> Vec<u64> {
+        env.storage()
+            .persistent()
+            .get(&DataKey::SenderDisbursements(sender))
+            .unwrap_or(Vec::new(&env))
     }
 }

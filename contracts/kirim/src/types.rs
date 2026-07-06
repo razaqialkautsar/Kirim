@@ -44,6 +44,8 @@ pub enum DataKey {
     Disbursement(u64),
     /// Menyimpan counter/ID terakhir untuk auto-increment (Instance Storage)
     DisbursementCount,
+    /// Menyimpan daftar ID Disbursement milik seorang sender (Persistent Storage)
+    SenderDisbursements(Address),
 }
 
 /// Error khusus untuk validasi dan alur smart contract
