@@ -5,11 +5,25 @@ mod types;
 #[cfg(test)]
 mod test;
 
-use soroban_sdk::{contract, contractimpl, token, Address, Env, Symbol, Vec};
+use soroban_sdk::{contract, contractevent, contractimpl, token, Address, Env, Vec};
 use types::{
     ContractError, DataKey, Disbursement, DisbursementStatus, RecipientShare, MAX_RECIPIENTS,
     PERCENTAGE_TOTAL_BPS,
 };
+
+#[contractevent]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct DisbursementCreated {
+    pub id: u64,
+    pub sender: Address,
+    pub total_amount: i128,
+}
+
+#[contractevent]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct DisbursementCompleted {
+    pub id: u64,
+}
 
 #[contract]
 pub struct KirimContract;
@@ -128,14 +142,17 @@ impl KirimContract {
         env.storage().persistent().set(&DataKey::Disbursement(current_id), &disbursement);
 
         // Emit events
-        env.events().publish(
-            (Symbol::new(&env, "DisbursementCreated"), current_id, sender.clone()),
+        DisbursementCreated {
+            id: current_id,
+            sender: sender.clone(),
             total_amount,
-        );
-        env.events().publish(
-            (Symbol::new(&env, "DisbursementCompleted"), current_id),
-            (),
-        );
+        }
+        .publish(&env);
+
+        DisbursementCompleted {
+            id: current_id,
+        }
+        .publish(&env);
 
         Ok(current_id)
     }

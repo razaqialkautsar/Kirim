@@ -3,7 +3,7 @@
 use super::*;
 use soroban_sdk::{
     testutils::{Address as _, Events},
-    token, Address, Env, Symbol, Vec,
+    token, Address, Env, Symbol, Vec, IntoVal,
 };
 use types::{ContractError, RecipientShare};
 
@@ -18,14 +18,15 @@ fn setup_test(
 ) {
     env.mock_all_auths();
 
-    let contract_id = env.register_contract(None, KirimContract);
+    let contract_id = env.register(KirimContract, ());
     let client = KirimContractClient::new(env, &contract_id);
 
     let admin = Address::generate(env);
     let token_admin = Address::generate(env);
 
     // Register SAC token (TESTUSD)
-    let token_contract_id = env.register_stellar_asset_contract(token_admin);
+    let token_contract = env.register_stellar_asset_contract_v2(token_admin);
+    let token_contract_id = token_contract.address();
     let token_client = token::Client::new(env, &token_contract_id);
     let token_admin_client = token::StellarAssetClient::new(env, &token_contract_id);
 
@@ -48,9 +49,7 @@ fn test_initialize_already_initialized() {
     let res = client.try_initialize(&admin, &token_id);
     assert_eq!(
         res,
-        Err(Ok(soroban_sdk::Error::from_contract_error(
-            ContractError::AlreadyInitialized as u32
-        )))
+        Err(Ok(ContractError::AlreadyInitialized))
     );
 }
 
@@ -175,25 +174,38 @@ fn test_disbursement_events() {
 
     client.create_and_execute_disbursement(&sender, &total_amount, &recipients);
 
-    let mut found_created = false;
-    let mut found_completed = false;
+    let created_data = soroban_sdk::Map::<Symbol, soroban_sdk::Val>::from_array(
+        &env,
+        [
+            (Symbol::new(&env, "id"), 0u64.into_val(&env)),
+            (Symbol::new(&env, "sender"), sender.into_val(&env)),
+            (Symbol::new(&env, "total_amount"), total_amount.into_val(&env)),
+        ],
+    );
 
-    for event in env.events().all().iter() {
-        if event.contract_id == client.address {
-            let topics = event.topics;
-            if topics.len() > 0 {
-                let event_type: Symbol = topics.get_unchecked(0).try_into_val(&env).unwrap();
-                if event_type == Symbol::new(&env, "DisbursementCreated") {
-                    found_created = true;
-                } else if event_type == Symbol::new(&env, "DisbursementCompleted") {
-                    found_completed = true;
-                }
-            }
-        }
-    }
+    let completed_data = soroban_sdk::Map::<Symbol, soroban_sdk::Val>::from_array(
+        &env,
+        [(Symbol::new(&env, "id"), 0u64.into_val(&env))],
+    );
 
-    assert!(found_created, "DisbursementCreated event not found");
-    assert!(found_completed, "DisbursementCompleted event not found");
+    let expected_events = soroban_sdk::vec![
+        &env,
+        (
+            client.address.clone(),
+            soroban_sdk::vec![&env, Symbol::new(&env, "disbursement_created").into_val(&env)],
+            created_data.into_val(&env),
+        ),
+        (
+            client.address.clone(),
+            soroban_sdk::vec![&env, Symbol::new(&env, "disbursement_completed").into_val(&env)],
+            completed_data.into_val(&env),
+        ),
+    ];
+
+    assert_eq!(
+        env.events().all().filter_by_contract(&client.address),
+        expected_events
+    );
 }
 
 #[test]
@@ -205,9 +217,7 @@ fn test_disbursement_not_initialized() {
     let res = client.try_create_and_execute_disbursement(&sender, &100, &recipients);
     assert_eq!(
         res,
-        Err(Ok(soroban_sdk::Error::from_contract_error(
-            ContractError::NotInitialized as u32
-        )))
+        Err(Ok(ContractError::NotInitialized))
     );
 }
 
@@ -221,9 +231,7 @@ fn test_disbursement_empty_recipients() {
     let res = client.try_create_and_execute_disbursement(&sender, &100, &recipients);
     assert_eq!(
         res,
-        Err(Ok(soroban_sdk::Error::from_contract_error(
-            ContractError::EmptyRecipients as u32
-        )))
+        Err(Ok(ContractError::EmptyRecipients))
     );
 }
 
@@ -246,9 +254,7 @@ fn test_disbursement_too_many_recipients() {
     let res = client.try_create_and_execute_disbursement(&sender, &100, &recipients);
     assert_eq!(
         res,
-        Err(Ok(soroban_sdk::Error::from_contract_error(
-            ContractError::TooManyRecipients as u32
-        )))
+        Err(Ok(ContractError::TooManyRecipients))
     );
 }
 
@@ -266,9 +272,7 @@ fn test_disbursement_invalid_percentage_total() {
     let res = client.try_create_and_execute_disbursement(&sender, &100, &recipients);
     assert_eq!(
         res,
-        Err(Ok(soroban_sdk::Error::from_contract_error(
-            ContractError::InvalidPercentageTotal as u32
-        )))
+        Err(Ok(ContractError::InvalidPercentageTotal))
     );
 }
 
@@ -286,9 +290,7 @@ fn test_disbursement_zero_amount() {
     let res = client.try_create_and_execute_disbursement(&sender, &0, &recipients);
     assert_eq!(
         res,
-        Err(Ok(soroban_sdk::Error::from_contract_error(
-            ContractError::ZeroAmount as u32
-        )))
+        Err(Ok(ContractError::ZeroAmount))
     );
 }
 
@@ -311,5 +313,5 @@ fn test_disbursement_auth_verified() {
     let auths = env.auths();
     assert_eq!(auths.len(), 1);
     let (auth_address, _) = auths.get(0).unwrap();
-    assert_eq!(auth_address, sender);
+    assert_eq!(auth_address, &sender);
 }
