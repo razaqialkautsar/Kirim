@@ -5,6 +5,7 @@ import transactionRouter from "./routes/transaction.route.js";
 import onrampRouter from "./routes/onramp.route.js";
 import sep24Router from "./routes/sep24.route.js";
 import dashboardRouter from "./routes/dashboard.route.js";
+import savingsRouter from "./routes/savings.route.js";
 
 const app = express();
 const PORT = process.env.PORT ?? 3001;
@@ -38,6 +39,7 @@ app.use("/api/transactions", transactionRouter);
 app.use("/api/onramp", onrampRouter);
 app.use("/", sep24Router); // /.well-known/stellar.toml, /sep24/*, /api/offramp/*
 app.use("/api/dashboard", dashboardRouter);
+app.use("/api/savings", savingsRouter);
 
 // Handler untuk route yang tidak ditemukan
 app.use((_req, res) => {
@@ -55,5 +57,6 @@ app.listen(PORT, () => {
   console.log(`   On-Ramp:      http://localhost:${PORT}/api/onramp`);
   console.log(`   Off-Ramp:     http://localhost:${PORT}/api/offramp/submit-bank`);
   console.log(`   Dashboard:    http://localhost:${PORT}/api/dashboard`);
+  console.log(`   Savings:      http://localhost:${PORT}/api/savings`);
   console.log(`   Stellar TOML: http://localhost:${PORT}/.well-known/stellar.toml\n`);
 });
