@@ -219,6 +219,42 @@ impl KirimContract {
 
         Ok(())
     }
+
+    pub fn withdraw_from_blend(env: Env, user: Address, amount: i128) -> Result<(), ContractError> {
+        user.require_auth();
+
+        let blend_pool = Address::from_string(&soroban_sdk::String::from_str(
+            &env,
+            "CCEBVDYM32YNYCVNRXQKDFFPISJJCV557CDZEIRBEE4NCV4KHPQ44HGF",
+        ));
+        let usdc_address = Address::from_string(&soroban_sdk::String::from_str(
+            &env,
+            "CAQCFVLOBK5GIULPNZRGATJJMIZL5BSP7X5YJVMGCPTUEPFM4AVSRCJU",
+        ));
+
+        let request = BlendRequest {
+            request_type: 3, // 3 = WithdrawCollateral
+            address: usdc_address,
+            amount,
+        };
+        let requests = soroban_sdk::vec![&env, request];
+
+        let args: soroban_sdk::Vec<soroban_sdk::Val> = soroban_sdk::vec![
+            &env,
+            user.clone().into_val(&env), // from
+            user.clone().into_val(&env), // spender
+            user.clone().into_val(&env), // to
+            requests.into_val(&env),     // requests
+        ];
+
+        let _: soroban_sdk::Val = env.invoke_contract(
+            &blend_pool,
+            &soroban_sdk::Symbol::new(&env, "submit"),
+            args,
+        );
+
+        Ok(())
+    }
 }
 
 #[soroban_sdk::contracttype]
