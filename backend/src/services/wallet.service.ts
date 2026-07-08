@@ -45,11 +45,11 @@ export async function provisionStellarAccount(userId: string): Promise<string> {
   }
   console.log(`[wallet] Akun ${publicKey} berhasil di-fund via Friendbot`);
 
-  // --- Tambahkan Trustline untuk TESTUSD ---
+  // --- Tambahkan Trustline untuk TESTUSD & USDC ---
   // Akun Stellar baru secara default hanya bisa memegang XLM.
-  // Agar bisa menerima TESTUSD, kita harus membuat transaksi 'ChangeTrust'
-  console.log(`[wallet] Membuat trustline untuk TESTUSD...`);
-  const { server, TESTUSD_ASSET, NETWORK_PASSPHRASE } = await import("../config/stellar.js");
+  // Agar bisa menerima TESTUSD dan USDC, kita harus membuat transaksi 'ChangeTrust'
+  console.log(`[wallet] Membuat trustline untuk TESTUSD dan USDC...`);
+  const { server, TESTUSD_ASSET, USDC_ASSET, NETWORK_PASSPHRASE } = await import("../config/stellar.js");
   const { TransactionBuilder, Operation, BASE_FEE } = await import("@stellar/stellar-sdk");
   
   const account = await server.loadAccount(publicKey);
@@ -62,12 +62,17 @@ export async function provisionStellarAccount(userId: string): Promise<string> {
         asset: TESTUSD_ASSET,
       })
     )
+    .addOperation(
+      Operation.changeTrust({
+        asset: USDC_ASSET,
+      })
+    )
     .setTimeout(30)
     .build();
 
   trustTx.sign(keypair);
   await server.submitTransaction(trustTx);
-  console.log(`[wallet] Trustline TESTUSD berhasil ditambahkan!`);
+  console.log(`[wallet] Trustline TESTUSD dan USDC berhasil ditambahkan!`);
 
   // Enkripsi secret key sebelum simpan ke DB
   const encryptedSecret = await encryptSecretKey(secretKey);

@@ -15,6 +15,7 @@ import {
   decryptSecretKey,
 } from "../config/stellar.js";
 import { getEncryptedSecretKey, getWalletByUserId } from "./wallet.service.js";
+import { emitToUser } from "../config/socket.js";
 
 export interface RecipientInput {
   stellarAddress: string; // Stellar public key penerima (G...)
@@ -234,15 +235,45 @@ export async function sendSplitPayment(
     throw new Error(`Submit transaksi Soroban gagal: ${reason}`);
   }
 
-  // Update transaksi dengan hash dan status completed
-  await supabase
+  // Update record transaksi
+  const { error: updateError } = await supabase
     .from("transactions")
     .update({
-      stellar_tx_hash: txHash,
       status: "completed",
+      stellar_tx_hash: txHash,
       completed_at: new Date().toISOString(),
     })
     .eq("id", transactionId);
+
+  if (updateError) {
+    console.error(`[payment] Gagal update status transaksi di DB: ${updateError.message}`);
+  }
+
+  // --- Kirim notifikasi WebSocket ke Pengirim ---
+  emitToUser(senderId, "transaction:completed", {
+    transactionId,
+    stellarTxHash: txHash,
+    totalAmount,
+    recipients
+  });
+
+  // --- Kirim notifikasi WebSocket ke masing-masing Penerima ---
+  for (const r of recipientAmounts) {
+    const { data: walletData } = await supabase
+      .from("stellar_wallets")
+      .select("user_id")
+      .eq("stellar_public_key", r.address)
+      .maybeSingle();
+
+    if (walletData?.user_id) {
+      emitToUser(walletData.user_id, "transaction:received", {
+        transactionId,
+        stellarTxHash: txHash,
+        amount: parseFloat(r.amount),
+        from: senderId
+      });
+    }
+  }
 
   return {
     transactionId,

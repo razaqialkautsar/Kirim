@@ -134,12 +134,14 @@ Mensimulasikan proses penukaran Ringgit Malaysia (MYR) menjadi TESTUSD yang lang
   "stellarTxHash": "abc123...",
   "amountMYR": 500,
   "amountTESTUSD": "110.0000000",
+  "bonusUSDC": "10.0000000",
   "exchangeRate": 0.22,
   "recipientStellarAddress": "GABC123...XYZ"
 }
 ```
 
 > **Batas:** Maksimal 50,000 MYR per transaksi.
+> **Bonus:** Setiap Top-Up MYR, user juga otomatis menerima **10 USDC** gratis yang dikirim langsung ke dompet mereka (ditujukan untuk dicoba pada fitur Tabungan Blend).
 
 ---
 
@@ -494,3 +496,43 @@ Semua error mengikuti format yang konsisten:
 | 401 | Token tidak ada atau sudah expired |
 | 404 | Data tidak ditemukan |
 | 500 | Error server (cek log backend) |
+
+---
+
+## 📡 WebSocket API (Real-Time Notifications)
+
+Backend mendukung koneksi WebSocket via **Socket.io** untuk mengirim notifikasi secara *real-time* tanpa perlu di-*refresh* oleh pengguna.
+
+### 1. Cara Menghubungkan WebSocket
+Gunakan pustaka `socket.io-client` di sisi frontend. Anda wajib mengirimkan Supabase JWT token saat inisialisasi agar server mengetahui identitas Anda.
+
+```javascript
+import { io } from "socket.io-client";
+
+// Inisialisasi koneksi dengan token
+const socket = io("http://localhost:3001", {
+  auth: { token: "<SUPABASE_JWT_TOKEN>" }
+});
+
+socket.on("connect", () => {
+  console.log("Terhubung ke server notifikasi!");
+});
+```
+
+### 2. Daftar Event yang Dipancarkan (Emitted) Server
+
+| Nama Event | Pemicu (Trigger) | Payload (Data) |
+|------------|------------------|----------------|
+| `onramp:completed` | Saat berhasil Top-up MYR | `{ transactionId, stellarTxHash, amountMYR, amountTESTUSD, bonusUSDC }` |
+| `transaction:completed` | Saat pengirim berhasil mengirim uang | `{ transactionId, stellarTxHash, totalAmount, recipients }` |
+| `transaction:received` | Saat penerima mendapatkan kiriman uang | `{ transactionId, stellarTxHash, amount, from }` |
+| `offramp:completed` | Saat proses pencairan bank berhasil | `{ transactionId, amountTESTUSD, amountIDR, bankCode }` |
+| `savings:deposited` | Saat berhasil menabung di Blend | `{ totalDeposited, stellarTxHash }` |
+
+**Contoh menangkap event:**
+```javascript
+socket.on("onramp:completed", (data) => {
+  alert(`Uang masuk! Transaksi ID: ${data.transactionId}`);
+  // Lakukan update state UI (misal panggil GET /api/dashboard ulang)
+});
+```

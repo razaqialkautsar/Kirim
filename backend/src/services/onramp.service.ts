@@ -9,8 +9,10 @@ import {
   server,
   NETWORK_PASSPHRASE,
   TESTUSD_ASSET,
+  USDC_ASSET,
 } from "../config/stellar.js";
 import { getWalletByUserId } from "./wallet.service.js";
+import { emitToUser } from "../config/socket.js";
 
 // ---------------------------------------------------------------------------
 // Kurs statis untuk simulasi (Hackathon demo)
@@ -76,6 +78,13 @@ export async function simulateOnRamp(
   }
   const distributorKeypair = Keypair.fromSecret(distributorSecret);
 
+  // --- Ambil akun Faucet USDC (bonus) ---
+  const usdcFaucetSecret = process.env.USDC_DEMO_ACCOUNT_SECRET_KEY;
+  if (!usdcFaucetSecret) {
+    throw new Error("USDC_DEMO_ACCOUNT_SECRET_KEY belum diisi di .env.");
+  }
+  const usdcFaucetKeypair = Keypair.fromSecret(usdcFaucetSecret);
+
   // --- Build transaksi Stellar ---
   const distributorAccount = await server.loadAccount(
     distributorKeypair.publicKey()
@@ -92,10 +101,19 @@ export async function simulateOnRamp(
         amount: amountTESTUSD,
       })
     )
+    .addOperation(
+      Operation.payment({
+        source: usdcFaucetKeypair.publicKey(),
+        destination: senderWallet.stellar_public_key,
+        asset: USDC_ASSET,
+        amount: "10.0000000",
+      })
+    )
     .setTimeout(30)
     .build();
 
   transaction.sign(distributorKeypair);
+  transaction.sign(usdcFaucetKeypair);
 
   // --- Submit ke Stellar Horizon ---
   let txHash: string;
@@ -132,11 +150,21 @@ export async function simulateOnRamp(
     );
   }
 
+  // --- Kirim notifikasi WebSocket ---
+  emitToUser(userId, "onramp:completed", {
+    transactionId: txRecord?.id ?? "unknown",
+    stellarTxHash: txHash,
+    amountMYR,
+    amountTESTUSD,
+    bonusUSDC: "10.0000000"
+  });
+
   return {
     transactionId: txRecord?.id ?? "unknown",
     stellarTxHash: txHash,
     amountMYR,
     amountTESTUSD,
+    bonusUSDC: "10.0000000",
     exchangeRate: EXCHANGE_RATE_MYR_TO_USD,
     recipientStellarAddress: senderWallet.stellar_public_key,
   };

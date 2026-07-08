@@ -93,7 +93,7 @@ router.post("/send", authMiddleware, async (req: Request, res: Response) => {
  */
 router.get("/:id/status", authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const data = await getTransactionStatus(id);
 
     res.json({

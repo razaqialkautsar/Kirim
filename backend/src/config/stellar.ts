@@ -1,6 +1,8 @@
 import "dotenv/config";
 import { Horizon, Asset, Networks, SorobanRpc, Contract } from "@stellar/stellar-sdk";
-import _sodium from "libsodium-wrappers";
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+const _sodium = require("libsodium-wrappers");
 
 // ---------------------------------------------------------------------------
 // Konfigurasi Stellar Network
@@ -47,6 +49,15 @@ if (!testusdIssuerPublicKey) {
 
 // Asset TESTUSD yang dipakai di seluruh aplikasi
 export const TESTUSD_ASSET = new Asset("TESTUSD", testusdIssuerPublicKey);
+
+// ---------------------------------------------------------------------------
+// Asset USDC (Circle Testnet)
+// ---------------------------------------------------------------------------
+// Issuer resmi USDC di Stellar Testnet. Digunakan untuk fitur Tabungan Blend.
+export const USDC_ASSET = new Asset(
+  "USDC",
+  "GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5"
+);
 
 // ---------------------------------------------------------------------------
 // Enkripsi / Dekripsi Secret Key Stellar

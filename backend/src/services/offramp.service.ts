@@ -1,4 +1,6 @@
 import { supabase } from "../config/supabase.js";
+import { getWalletByUserId } from "./wallet.service.js";
+import { emitToUser } from "../config/socket.js";
 
 // ---------------------------------------------------------------------------
 // Kurs statis Off-Ramp: 1 TESTUSD ≈ Rp15.000
@@ -129,6 +131,14 @@ export async function processOffRamp(
     `a.n. ${input.accountName}`;
 
   console.log(`[offramp] ${resultMessage}`);
+
+  // --- Kirim notifikasi WebSocket ---
+  emitToUser(userId, "offramp:completed", {
+    transactionId: record?.id,
+    amountTESTUSD,
+    amountIDR,
+    bankCode: input.bankCode,
+  });
 
   return {
     offrampTxId: record?.id ?? "unknown",

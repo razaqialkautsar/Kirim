@@ -14,6 +14,7 @@ import {
   decryptSecretKey,
 } from "../config/stellar.js";
 import { getEncryptedSecretKey, getWalletByUserId } from "./wallet.service.js";
+import { emitToUser } from "../config/socket.js";
 
 // ================================================================
 // Konstanta Simulasi Yield (Off-Chain Indexer — Opsi B)
@@ -144,26 +145,37 @@ export async function depositToSavings(
     .eq("user_id", userId)
     .single();
 
-  let totalDeposited: number;
-
   if (existing) {
-    totalDeposited = parseFloat(existing.amount_deposited) + amount;
+    const currentDeposit = parseFloat(existing.amount_deposited);
+    const newTotal = currentDeposit + amount;
+
     await supabase
       .from("savings_positions")
       .update({
-        amount_deposited: totalDeposited,
+        amount_deposited: newTotal,
         updated_at: new Date().toISOString(),
       })
       .eq("id", existing.id);
+
+    emitToUser(userId, "savings:deposited", {
+      totalDeposited: newTotal,
+      stellarTxHash: txHash
+    });
+
+    return { totalDeposited: newTotal, stellarTxHash: txHash };
   } else {
-    totalDeposited = amount;
     await supabase.from("savings_positions").insert({
       user_id: userId,
       amount_deposited: amount,
     });
-  }
 
-  return { totalDeposited, stellarTxHash: txHash };
+    emitToUser(userId, "savings:deposited", {
+      totalDeposited: amount,
+      stellarTxHash: txHash
+    });
+
+    return { totalDeposited: amount, stellarTxHash: txHash };
+  }
 }
 
 // ================================================================
