@@ -1,14 +1,17 @@
 import {
   Keypair,
   TransactionBuilder,
-  Operation,
   BASE_FEE,
+  xdr,
+  Address,
+  nativeToScVal,
+  SorobanRpc,
 } from "@stellar/stellar-sdk";
 import { supabase } from "../config/supabase.js";
 import {
-  server,
+  sorobanServer,
   NETWORK_PASSPHRASE,
-  TESTUSD_ASSET,
+  kirimContract,
   decryptSecretKey,
 } from "../config/stellar.js";
 import { getEncryptedSecretKey, getWalletByUserId } from "./wallet.service.js";
@@ -24,12 +27,44 @@ export interface SendPaymentResult {
   status: string;
 }
 
+// ---------------------------------------------------------------------------
+// Helper: Konversi RecipientInput[] → Vec<RecipientShare> dalam format ScVal
+// Sesuai dengan struct RecipientShare di contracts/src/types.rs:
+//   { recipient: Address, percentage: u32, amount: i128 }
+// ---------------------------------------------------------------------------
+function buildRecipientsScVal(
+  recipients: RecipientInput[],
+  totalAmount: number
+): xdr.ScVal {
+  const shares = recipients.map((r) => {
+    // Hitung amount per penerima (dalam stroops / unit terkecil)
+    const amount = Math.floor((totalAmount * r.percentageBps) / 10000);
+
+    return xdr.ScVal.scvMap([
+      new xdr.ScMapEntry({
+        key: xdr.ScVal.scvSymbol("amount"),
+        val: nativeToScVal(BigInt(amount), { type: "i128" }),
+      }),
+      new xdr.ScMapEntry({
+        key: xdr.ScVal.scvSymbol("percentage"),
+        val: nativeToScVal(r.percentageBps, { type: "u32" }),
+      }),
+      new xdr.ScMapEntry({
+        key: xdr.ScVal.scvSymbol("recipient"),
+        val: new Address(r.stellarAddress).toScVal(),
+      }),
+    ]);
+  });
+
+  return xdr.ScVal.scvVec(shares);
+}
+
 /**
  * Kirim TESTUSD dari sender ke beberapa penerima sekaligus
- * menggunakan Stellar native multi-operation transaction.
+ * menggunakan Smart Contract Soroban (P2).
  *
- * Ini adalah implementasi Opsi A (tanpa Smart Contract Soroban) —
- * bisa diganti ke Opsi B (panggil Soroban) tanpa mengubah interface fungsi ini.
+ * Memanggil fungsi `create_and_execute_disbursement` pada kontrak Kirim
+ * yang sudah di-deploy oleh Tim Smart Contract.
  *
  * @param senderId - UUID user pengirim (dari Supabase Auth)
  * @param recipients - Array penerima dan persentase masing-masing
@@ -40,6 +75,13 @@ export async function sendSplitPayment(
   recipients: RecipientInput[],
   totalAmountTestusd: string
 ): Promise<SendPaymentResult> {
+  // --- Prasyarat: Kontrak harus sudah dikonfigurasi ---
+  if (!kirimContract) {
+    throw new Error(
+      "KIRIM_CONTRACT_ID belum diisi di .env. Fitur Soroban (P2) tidak aktif."
+    );
+  }
+
   // --- Validasi input ---
   if (recipients.length < 1 || recipients.length > 5) {
     throw new Error("Jumlah penerima harus antara 1 sampai 5.");
@@ -60,10 +102,12 @@ export async function sendSplitPayment(
   // --- Ambil wallet sender ---
   const senderWallet = await getWalletByUserId(senderId);
   if (!senderWallet) {
-    throw new Error(`User ${senderId} belum punya Stellar wallet. Jalankan /api/wallets/provision dulu.`);
+    throw new Error(
+      `User ${senderId} belum punya Stellar wallet. Jalankan /api/wallets/provision dulu.`
+    );
   }
 
-  // --- Hitung amount per penerima ---
+  // --- Hitung amount per penerima (untuk disimpan di DB) ---
   const recipientAmounts = recipients.map((r) => ({
     address: r.stellarAddress,
     amount: ((totalAmount * r.percentageBps) / 10000).toFixed(7),
@@ -81,7 +125,9 @@ export async function sendSplitPayment(
     .single();
 
   if (txInsertError || !txRecord) {
-    throw new Error(`Gagal membuat record transaksi: ${txInsertError?.message}`);
+    throw new Error(
+      `Gagal membuat record transaksi: ${txInsertError?.message}`
+    );
   }
 
   const transactionId = txRecord.id;
@@ -96,40 +142,64 @@ export async function sendSplitPayment(
     }))
   );
 
-  // --- Build transaksi Stellar ---
+  // --- Build transaksi Soroban ---
   // Decrypt secret key hanya di memory (JANGAN pernah log nilai ini)
   const encryptedSecret = await getEncryptedSecretKey(senderId);
   const senderSecretKey = await decryptSecretKey(encryptedSecret);
   const senderKeypair = Keypair.fromSecret(senderSecretKey);
 
-  // Load akun sender untuk mendapatkan sequence number terbaru
-  const senderAccount = await server.loadAccount(senderWallet.stellar_public_key);
+  // Load akun sender dari Soroban RPC (untuk sequence number)
+  const senderAccount = await sorobanServer.getAccount(
+    senderWallet.stellar_public_key
+  );
 
-  // Build transaction dengan multiple payment operations (1 per penerima)
-  const txBuilder = new TransactionBuilder(senderAccount, {
+  // Build parameter pemanggilan Smart Contract
+  const senderScVal = new Address(senderWallet.stellar_public_key).toScVal();
+  const totalAmountScVal = nativeToScVal(BigInt(Math.floor(totalAmount * 10_000_000)), {
+    type: "i128",
+  }); // Konversi ke stroops (7 desimal)
+  const recipientsScVal = buildRecipientsScVal(recipients, Math.floor(totalAmount * 10_000_000));
+
+  // Rakit transaksi invokeHostFunction
+  const transaction = new TransactionBuilder(senderAccount, {
     fee: BASE_FEE,
     networkPassphrase: NETWORK_PASSPHRASE,
-  });
-
-  for (const recipient of recipientAmounts) {
-    txBuilder.addOperation(
-      Operation.payment({
-        destination: recipient.address,
-        asset: TESTUSD_ASSET,
-        amount: recipient.amount,
-      })
-    );
-  }
-
-  const transaction = txBuilder
-    .setTimeout(30) // transaksi kedaluwarsa dalam 30 detik
+  })
+    .addOperation(
+      kirimContract.call(
+        "create_and_execute_disbursement",
+        senderScVal,
+        totalAmountScVal,
+        recipientsScVal
+      )
+    )
+    .setTimeout(30)
     .build();
 
+  // --- Simulasi dulu (WAJIB untuk Soroban) ---
+  // Soroban membutuhkan simulasi untuk menghitung resource fee
+  const simResult = await sorobanServer.simulateTransaction(transaction);
+
+  if (SorobanRpc.Api.isSimulationError(simResult)) {
+    const reason =
+      "error" in simResult ? String(simResult.error) : "Simulasi gagal";
+    await supabase
+      .from("transactions")
+      .update({ status: "failed", failure_reason: reason })
+      .eq("id", transactionId);
+    throw new Error(`Simulasi Soroban gagal: ${reason}`);
+  }
+
+  // Gabungkan hasil simulasi (resource fee, auth) ke transaksi asli
+  const preparedTx = SorobanRpc.assembleTransaction(
+    transaction,
+    simResult
+  ).build();
+
   // Sign transaksi
-  transaction.sign(senderKeypair);
+  preparedTx.sign(senderKeypair);
 
   // Hapus secret key dari memory secepat mungkin
-  // (JS tidak bisa truly zero-out memory, tapi ini best practice)
   senderSecretKey.replace(/./, "x");
 
   // Update status ke 'submitted' sebelum submit ke jaringan
@@ -138,20 +208,31 @@ export async function sendSplitPayment(
     .update({ status: "submitted" })
     .eq("id", transactionId);
 
-  // --- Submit ke Stellar Horizon ---
+  // --- Submit ke Soroban RPC ---
   let txHash: string;
   try {
-    const result = await server.submitTransaction(transaction);
-    txHash = result.hash;
-    console.log(`[payment] Transaksi sukses: ${txHash}`);
+    const sendResult = await sorobanServer.sendTransaction(preparedTx);
+    txHash = sendResult.hash;
+
+    // Polling status sampai transaksi terkonfirmasi
+    let getResult = await sorobanServer.getTransaction(txHash);
+    while (getResult.status === "NOT_FOUND") {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      getResult = await sorobanServer.getTransaction(txHash);
+    }
+
+    if (getResult.status === "FAILED") {
+      throw new Error("Transaksi Soroban gagal di jaringan (status: FAILED)");
+    }
+
+    console.log(`[payment/soroban] Transaksi sukses: ${txHash}`);
   } catch (err: unknown) {
-    // Jika submit gagal, update status ke 'failed' dan lempar error
     const reason = err instanceof Error ? err.message : String(err);
     await supabase
       .from("transactions")
       .update({ status: "failed", failure_reason: reason })
       .eq("id", transactionId);
-    throw new Error(`Submit transaksi Stellar gagal: ${reason}`);
+    throw new Error(`Submit transaksi Soroban gagal: ${reason}`);
   }
 
   // Update transaksi dengan hash dan status completed
