@@ -372,7 +372,7 @@ section:nth-of-type(even) {
 
 .whatis-flow__step {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--spacing-16);
   padding: var(--spacing-16);
   border-radius: 12px;
@@ -494,6 +494,12 @@ section:nth-of-type(even) {
   border-top: 1px solid var(--color-ash);
 }
 
+.cost-card__list__item{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .cost-card--good .cost-card__list {
   color: var(--color-ash);
   border-top-color: rgba(255,255,255,0.1);
@@ -559,6 +565,12 @@ section:nth-of-type(even) {
   box-shadow: var(--shadow-card-hover);
 }
 
+.feature-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .feature-card--highlight {
   background: var(--color-carbon-black) !important;
   color: var(--color-paper-white) !important;
@@ -617,7 +629,7 @@ section:nth-of-type(even) {
 .how-steps {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--spacing-24);
+  gap: var(--spacing-40);
   position: relative;
 }
 
