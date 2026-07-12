@@ -130,6 +130,7 @@ Mensimulasikan proses penukaran Ringgit Malaysia (MYR) menjadi TESTUSD yang lang
 **Response Sukses (200):**
 ```json
 {
+  "message": "On-ramp berhasil! 500 MYR → 110.0000000 TESTUSD",
   "transactionId": "uuid-xxx",
   "stellarTxHash": "abc123...",
   "amountMYR": 500,

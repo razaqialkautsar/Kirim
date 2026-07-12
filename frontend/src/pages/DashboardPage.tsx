@@ -92,6 +92,12 @@ function TransactionRow({ tx }: { tx: DashboardData['history'][0] }) {
     offramp: 'Cairkan',
   }
 
+  // Support both camelCase (backend) and snake_case (legacy)
+  const txType = (tx as any).txType ?? (tx as any).tx_type
+  const totalAmount = (tx as any).totalAmount ?? (tx as any).total_amount
+  const createdAt = (tx as any).createdAt ?? (tx as any).created_at
+  const stellarTxHash = (tx as any).stellarTxHash ?? (tx as any).stellar_tx_hash
+
   const statusEl = (
     <span className={`status-${tx.status}`}>
       {tx.status === 'completed' ? 'Selesai' : tx.status === 'pending' ? 'Diproses' : 'Gagal'}
@@ -102,38 +108,42 @@ function TransactionRow({ tx }: { tx: DashboardData['history'][0] }) {
     <div className={`tx-row ${expanded ? 'expanded' : ''}`}>
       <div
         className="tx-row-main"
-        onClick={() => tx.tx_type === 'disbursement' && setExpanded(e => !e)}
-        style={{ cursor: tx.tx_type === 'disbursement' ? 'pointer' : 'default' }}
+        onClick={() => txType === 'disbursement' && setExpanded(e => !e)}
+        style={{ cursor: txType === 'disbursement' ? 'pointer' : 'default' }}
       >
-        <div className="tx-type-badge">{typeLabel[tx.tx_type] ?? tx.tx_type}</div>
-        <div className="tx-amount">{tx.total_amount.toFixed(2)} TESTUSD</div>
-        <div className="tx-date">{new Date(tx.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+        <div className="tx-type-badge">{typeLabel[txType] ?? txType}</div>
+        <div className="tx-amount">{Number(totalAmount).toFixed(2)} TESTUSD</div>
+        <div className="tx-date">{new Date(createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
         <div>{statusEl}</div>
-        {tx.stellar_tx_hash && (
+        {stellarTxHash && (
           <a
-            href={`https://stellar.expert/explorer/testnet/tx/${tx.stellar_tx_hash}`}
+            href={`https://stellar.expert/explorer/testnet/tx/${stellarTxHash}`}
             target="_blank"
             rel="noreferrer"
             className="tx-hash mono"
             onClick={e => e.stopPropagation()}
           >
-            {tx.stellar_tx_hash.slice(0, 8)}…
+            {stellarTxHash.slice(0, 8)}…
           </a>
         )}
-        {tx.tx_type === 'disbursement' && (
+        {txType === 'disbursement' && (
           <span className="tx-expand-icon">{expanded ? '▲' : '▼'}</span>
         )}
       </div>
 
       {expanded && tx.recipients && (
         <div className="tx-recipients">
-          {tx.recipients.map((r, i) => (
-            <div key={i} className="tx-recipient-row">
-              <span className="mono tx-recipient-addr">{r.stellar_address.slice(0, 6)}…{r.stellar_address.slice(-4)}</span>
-              <span>{(r.percentage_bps / 100).toFixed(0)}%</span>
-              <span>{r.amount.toFixed(2)} TESTUSD</span>
-            </div>
-          ))}
+          {tx.recipients.map((r, i) => {
+            const addr = (r as any).receiverStellarAddress ?? (r as any).stellar_address ?? ''
+            const bps = (r as any).percentageBps ?? (r as any).percentage_bps ?? 0
+            return (
+              <div key={i} className="tx-recipient-row">
+                <span className="mono tx-recipient-addr">{addr.slice(0, 6)}…{addr.slice(-4)}</span>
+                <span>{(bps / 100).toFixed(0)}%</span>
+                <span>{r.amount.toFixed(2)} TESTUSD</span>
+              </div>
+            )
+          })}
         </div>
       )}
     </div>
@@ -611,9 +621,20 @@ export function DashboardPage() {
   const fetchDashboard = useCallback(async () => {
     try {
       const res = await kirimApi.getDashboard()
-      if (res.data && res.data.wallet) {
+      if (res.data) {
         setData(res.data)
         setFetchError('')
+        // Jika wallet belum ada, provision otomatis
+        if (!res.data.wallet) {
+          try {
+            await kirimApi.provisionWallet()
+            // Fetch ulang setelah provision
+            const res2 = await kirimApi.getDashboard()
+            if (res2.data) setData(res2.data)
+          } catch {
+            console.warn('[dashboard] Wallet provision gagal')
+          }
+        }
       } else {
         setFetchError('Data dashboard tidak lengkap dari server.')
       }
@@ -679,7 +700,7 @@ export function DashboardPage() {
   }
 
   function copyAddress() {
-    if (!data?.wallet.stellarAddress) return
+    if (!data?.wallet?.stellarAddress) return
     navigator.clipboard.writeText(data.wallet.stellarAddress)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
@@ -719,7 +740,7 @@ export function DashboardPage() {
             )}
           </div>
 
-          {data?.wallet.stellarAddress && (
+          {data?.wallet?.stellarAddress && (
             <div className="card sidebar-addr-card">
               <div className="form-label">Stellar Address</div>
               <div className="stellar-addr">

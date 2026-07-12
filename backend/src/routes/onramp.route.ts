@@ -48,7 +48,7 @@ router.post("/simulate", authMiddleware, async (req: Request, res: Response) => 
 
     res.json({
       message: `On-ramp berhasil! ${result.amountMYR} MYR → ${result.amountTESTUSD} TESTUSD`,
-      data: result,
+      ...result,
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);

@@ -63,7 +63,7 @@ const api = {
 // ─── Typed Interfaces ─────────────────────────────────────────────────────
 
 export interface DashboardData {
-  wallet: { stellarAddress: string }
+  wallet: { stellarAddress: string } | null
   metrics: {
     totalTransactions: number
     totalOnRampMYR: number
@@ -78,16 +78,16 @@ export interface DashboardData {
 
 export interface TransactionRecord {
   id: string
-  tx_type: 'onramp' | 'disbursement' | 'offramp'
-  total_amount: number
-  exchange_rate?: number
+  txType: 'onramp' | 'disbursement' | 'offramp'
+  totalAmount: number
+  exchangeRate?: number
   status: 'pending' | 'completed' | 'failed'
-  created_at: string
-  completed_at?: string
-  stellar_tx_hash?: string
+  createdAt: string
+  completedAt?: string
+  stellarTxHash?: string
   recipients?: {
-    stellar_address: string
-    percentage_bps: number
+    receiverStellarAddress: string
+    percentageBps: number
     amount: number
   }[]
 }
