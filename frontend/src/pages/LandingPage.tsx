@@ -59,7 +59,10 @@ function LandingNav() {
   return (
     <nav className={`landing-nav ${scrolled ? 'landing-nav--scrolled' : ''}`} aria-label="Navigasi utama">
       <div className="landing-nav__inner">
-        <span className="landing-nav__brand" aria-label="Kirim">KIRIM</span>
+        <span className="landing-nav__brand" aria-label="Kirim">
+          <img src={scrolled ? '/logokirimblack.png' : '/logokirimwhite.png'} alt="logo kirim" />
+          
+        </span>
         <div className="landing-nav__links">
           <a href="#how" className="landing-nav__link">Cara Kerja</a>
           <a href="#features" className="landing-nav__link">Fitur</a>
@@ -78,7 +81,7 @@ function HeroSection() {
       <div className="page-container hero__inner">
         {/* Eyebrow */}
         <span className="tag tag-yellow hero__eyebrow">
-          ✦ Stellar Blockchain · Malaysia → Indonesia
+          ✦ Quick Remittance · Malaysia → Indonesia
         </span>
 
         {/* Headline */}
@@ -89,8 +92,7 @@ function HeroSection() {
         </h1>
 
         <p className="hero__subhead">
-          Transfer ke keluarga di Indonesia dalam hitungan detik, bukan hari —
-          dengan biaya mendekati nol. Bukan omong kosong: verifiable di blockchain.
+          Transfer ke keluarga di Indonesia dalam hitungan detik dengan biaya mendekati NOL
         </p>
 
         {/* CTA row */}
@@ -98,20 +100,17 @@ function HeroSection() {
           <Link to="/signup" className="btn-primary hero__cta-main" id="hero-cta-signup">
             Mulai Kirim Sekarang →
           </Link>
-          <a href="#stats" className="btn-ghost">
-            Lihat datanya
-          </a>
         </div>
 
         {/* Live ticker bar */}
         <div className="hero__ticker" aria-label="Metrik kecepatan">
           <div className="hero__ticker-item">
-            <span className="hero__ticker-label mono">Settlement time</span>
+            <span className="hero__ticker-label mono">Waktu Proses</span>
             <span className="hero__ticker-value">&lt; 5 detik</span>
           </div>
           <div className="hero__ticker-divider" />
           <div className="hero__ticker-item">
-            <span className="hero__ticker-label mono">Biaya jaringan</span>
+            <span className="hero__ticker-label mono">Biaya Kirim</span>
             <span className="hero__ticker-value">≈ Rp 0</span>
           </div>
           <div className="hero__ticker-divider" />
@@ -148,7 +147,7 @@ function StatsSection() {
             Uang Kamu<br />Susut di Perjalanan
           </h2>
           <p className="stats-section__desc">
-            Setiap MYR yang kamu kirim, sebagian besar hilang sebagai biaya —
+            Setiap MYR yang anda kirim, sebagian besar hilang sebagai biaya,
             bukan karena harus, tapi karena belum ada alternatif yang lebih baik.
           </p>
         </div>
@@ -193,18 +192,14 @@ function WhatIsSection() {
               <span className="whatis-text__accent">Generasi Baru</span>
             </h2>
             <p className="whatis-text__body">
-              Kirim bukan aplikasi kripto. Kirim adalah lapisan settlement yang menggunakan
-              jaringan Stellar di backend — kamu cukup input nominal MYR,
+              Kirim bukan aplikasi kripto. Kirim adalah layanan pengiriman uang dari Malaysia ke Indonesia dengan pemanfaatan teknologi kripto melalui jaringan Stellar.
+              Kamu cukup input/top-up MYR,
               keluarga di Indonesia terima rupiah ke rekening mereka.
             </p>
-            <p className="whatis-text__body">
-              Kripto hanya dipakai di infrastruktur backend untuk kecepatan dan efisiensi.
-              Kamu tidak perlu paham blockchain untuk pakai Kirim.
-            </p>
             <div className="whatis-badges">
-              <span className="tag">Stellar Network</span>
-              <span className="tag">SEP-24 Anchor</span>
-              <span className="tag tag-yellow">Bukan alat pembayaran kripto</span>
+              <span className="tag">Cepat</span>
+              <span className="tag">Murah</span>
+              <span className="tag tag-yellow">Transaparan</span>
             </div>
           </div>
 
@@ -225,7 +220,7 @@ function WhatIsSection() {
                   <span className="whatis-flow__icon">⚡</span>
                   <div>
                     <div className="whatis-flow__title">Stellar Network</div>
-                    <div className="mono whatis-flow__sub">Settlement &lt;5 detik · Fee ≈ $0</div>
+                    <div className="mono whatis-flow__sub">Sampai dalam &lt;5 detik · biaya ≈ $0</div>
                   </div>
                 </div>
                 <div className="whatis-flow__arrow">↓</div>
@@ -257,7 +252,7 @@ function CostSection() {
       ref={ref as React.RefObject<HTMLElement>}>
       <div className="page-container">
         <div className={`cost-header ${inView ? 'anim-in' : ''}`}>
-          <span className="tag tag-yellow">Kalkulator Perbandingan</span>
+          <span className="tag tag-yellow">Perbandingan</span>
           <h2 id="cost-heading" className="heading-lg">
             Berapa yang Kamu<br />Hemat dengan Kirim?
           </h2>
