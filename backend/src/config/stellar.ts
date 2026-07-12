@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { Horizon, Asset, Networks, SorobanRpc, Contract } from "@stellar/stellar-sdk";
+import { Horizon, Asset, Networks, rpc, Contract } from "@stellar/stellar-sdk";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 const _sodium = require("libsodium-wrappers");
@@ -16,7 +16,7 @@ const sorobanRpcUrl =
 export const server = new Horizon.Server(horizonUrl);
 
 // Soroban RPC Server — untuk transaksi Smart Contract (P2)
-export const sorobanServer = new SorobanRpc.Server(sorobanRpcUrl);
+export const sorobanServer = new rpc.Server(sorobanRpcUrl);
 
 export const NETWORK_PASSPHRASE =
   process.env.NETWORK_PASSPHRASE ?? Networks.TESTNET;

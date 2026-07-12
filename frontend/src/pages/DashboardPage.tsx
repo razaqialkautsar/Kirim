@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { kirimApi, getSocket } from '../lib/api'
 import type { DashboardData, RecipientInput, SavingsPosition } from '../lib/api'
+import { IconAffiliate, IconPigMoney, IconHistory, IconBuildingBank, IconZzz } from '@tabler/icons-react';
 import './DashboardPage.css'
 
 type Tab = 'kirim' | 'cairkan' | 'tabungan' | 'riwayat'
-
+type Icon = "icon-affiliate" | "icon-pig-money" | "icon-history" | "icon-building-bank"
 // ─── Toast Notification ───────────────────────────────────────────────────
 interface Toast {
   id: number
@@ -457,7 +458,7 @@ function TabunganTab({ addToast }: { addToast: (msg: string, type: Toast['type']
   return (
     <div className="tab-form">
       {/* ─ Header Badge ─ */}
-      <div className="blend-header">
+      {/* <div className="blend-header">
         <div className="blend-badge">
           <span className="blend-dot" />
           <span>Blend Protocol — On-Chain</span>
@@ -465,7 +466,7 @@ function TabunganTab({ addToast }: { addToast: (msg: string, type: Toast['type']
         <div className="blend-apy">
           APY <strong>{position?.apyPercentage ?? 8.5}%</strong>
         </div>
-      </div>
+      </div> */}
 
       {/* ─ Posisi Tabungan ─ */}
       {loadingPos ? (
@@ -500,8 +501,11 @@ function TabunganTab({ addToast }: { addToast: (msg: string, type: Toast['type']
         </div>
       ) : (
         <div className="empty-state">
-          <p>💡 Belum ada tabungan aktif.</p>
-          <p className="form-hint">Deposit TESTUSD/USDC ke Blend dan dapatkan bunga <strong>8.5% APY</strong> yang berjalan per detik!</p>
+          <p className='empty-state__main'>
+            <IconZzz />
+             Belum ada tabungan aktif.
+          </p>
+          <p className="form-hint">Deposit TESTUSD/USDC ke Blend dan dapatkan bunga <strong>8.5% APY</strong> </p>
         </div>
       )}
 
@@ -762,7 +766,7 @@ export function DashboardPage() {
           {data?.metrics && (
             <div className="card sidebar-stats-card">
               <div className="stat-row">
-                <span className="form-label">Tx Sukses</span>
+                <span className="form-label">Jumlah Transaksi Berhasil</span>
                 <span className="mono">{data.metrics.totalTransactions}</span>
               </div>
               <div className="stat-row">
@@ -771,10 +775,10 @@ export function DashboardPage() {
                   ${data.metrics.totalSavedUSD.toFixed(2)}
                 </span>
               </div>
-              <div className="stat-row">
+              {/* <div className="stat-row">
                 <span className="form-label">vs Bank Tradisional</span>
                 <span className="mono">{data.metrics.traditionalFeePercent}%</span>
-              </div>
+              </div> */}
               <div className="stat-row">
                 <span className="form-label">Biaya Kirim</span>
                 <span className="mono stat-highlight">{data.metrics.kirimFeePercent}%</span>
@@ -799,10 +803,14 @@ export function DashboardPage() {
                 className={`tab-btn ${tab === t ? 'active' : ''}`}
                 onClick={() => setTab(t)}
               >
-                {t === 'kirim' ? '💸 Kirim'
-                  : t === 'cairkan' ? '🏦 Cairkan'
-                  : t === 'tabungan' ? '🌱 Tabungan'
-                  : '📋 Riwayat'}
+                {t === 'kirim' ?  <IconAffiliate size={22}/>
+                  : t === 'cairkan' ? <IconBuildingBank size={22}/>
+                  : t === 'tabungan' ? <IconPigMoney size={22} />
+                  : <IconHistory size={22} />}
+                {t === 'kirim' ?  'Kirim'
+                  : t === 'cairkan' ? 'Cairkan'
+                  : t === 'tabungan' ? 'Tabungan'
+                  : 'Riwayat'}
               </button>
             ))}
           </div>

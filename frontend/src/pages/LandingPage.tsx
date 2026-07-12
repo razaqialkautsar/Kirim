@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { IconHourglassHigh, IconMoodAngry, IconBusinessplan, IconCurrencyDollarOff, IconBolt,  IconDeviceMobile,  IconBrandStellar, IconAffiliate, IconPigMoney, IconBoltFilled, IconBuildingBank, IconLockPassword } from '@tabler/icons-react';
 import './LandingPage.css'
 
 // ── Intersection Observer hook for scroll-in animations ────────────────────
@@ -142,7 +143,7 @@ function StatsSection() {
       ref={ref as React.RefObject<HTMLElement>}>
       <div className="page-container">
         <div className={`stats-section__header ${inView ? 'anim-in' : ''}`}>
-          <span className="tag">Realita di lapangan</span>
+          <span className="tag">Reality Problem</span>
           <h2 id="stats-heading" className="heading-lg stats-section__title">
             Uang Kamu<br />Susut di Perjalanan
           </h2>
@@ -168,7 +169,7 @@ function StatsSection() {
         </div>
 
         <p className="stats-section__source mono">
-          * Sumber: World Bank Remittance Prices Worldwide, corridor MY→ID, nominal ~USD65
+          * Sumber: World Bank Remittance Prices Worldwide
         </p>
       </div>
     </section>
@@ -217,7 +218,7 @@ function WhatIsSection() {
                 </div>
                 <div className="whatis-flow__arrow">↓</div>
                 <div className="whatis-flow__step whatis-flow__step--accent">
-                  <span className="whatis-flow__icon">⚡</span>
+                  <IconBrandStellar />
                   <div>
                     <div className="whatis-flow__title">Stellar Network</div>
                     <div className="mono whatis-flow__sub">Sampai dalam &lt;5 detik · biaya ≈ $0</div>
@@ -267,10 +268,22 @@ function CostSection() {
             </div>
             <div className="cost-card__sublabel">hilang sebagai biaya per MYR1,000</div>
             <ul className="cost-card__list">
-              <li>⏳ 1–3 hari kerja</li>
-              <li>📄 Antri & formulir fisik</li>
-              <li>💸 4,80% rata-rata biaya</li>
-              <li>🔒 Kurs tidak transparan</li>
+              <li className='cost-card__list__item'> 
+                <IconHourglassHigh />
+                1–3 hari Kerja
+              </li>
+              <li className='cost-card__list__item'>
+                <IconMoodAngry />
+                Antri & formulir fisik
+              </li>
+              <li className='cost-card__list__item'> 
+                <IconBusinessplan />
+                4,80% rata-rata biaya
+              </li>
+              <li className='cost-card__list__item'>
+                <IconCurrencyDollarOff />
+                 Kurs tidak transparan
+              </li>
             </ul>
           </div>
 
@@ -281,23 +294,32 @@ function CostSection() {
           <div className="cost-card cost-card--good">
             <div className="cost-card__label mono">Kirim</div>
             <div className="cost-card__amount display cost-card__amount--mint">
-              MYR {(amount * kirimFeeRate).toFixed(0)}
+              MYR ≈{(amount * kirimFeeRate).toFixed(0)}
             </div>
             <div className="cost-card__sublabel">biaya jaringan per MYR1,000</div>
             <ul className="cost-card__list">
-              <li>⚡ &lt; 5 detik settlement</li>
-              <li>📱 Dari HP, kapan saja</li>
-              <li>✅ Biaya mendekati nol</li>
-              <li>🔍 Verifiable di blockchain</li>
+              <li className='cost-card__list__item'>
+                <IconBolt />
+                 &lt; 5 detik settlement
+              </li>
+              <li className='cost-card__list__item'>
+                <IconDeviceMobile />
+                 Dari Ponsel anda, kapan saja
+              </li>
+              <li className='cost-card__list__item'> 
+                <IconCurrencyDollarOff />
+                Biaya mendekati NOL
+              </li>
+              <li className='cost-card__list__item'>
+                <IconBrandStellar />
+                Transparan di blockchain
+              </li>
             </ul>
             <div className="cost-card__savings">
               Hemat ≈ <strong>MYR {(amount * tradFeeRate).toFixed(0)}</strong> per kiriman
             </div>
           </div>
         </div>
-        <p className="cost-disclaimer mono">
-          * Biaya jaringan Stellar: ~0.00001 XLM per transaksi ≈ Rp0,01. Simulasi di atas menggunakan data World Bank 2024.
-        </p>
       </div>
     </section>
   )
@@ -309,39 +331,39 @@ function FeaturesSection() {
 
   const features = [
     {
-      icon: '🔀',
+      icon: 'IconAffiliate',
       title: 'Split ke Banyak Penerima',
-      body: 'Satu kiriman bisa dibagi ke istri, orang tua, dan tabungan anak sekaligus — satu transaksi, atomik, tidak bisa gagal sebagian.',
+      body: 'Satu kiriman bisa dibagi ke istri, orang tua, dan tabungan anak sekaligus dalam satu kali transaksi, atomik, tidak bisa gagal sebagian.',
       tag: 'Multi-recipient',
     },
     {
-      icon: '🌱',
+      icon: 'IconPigMoney',
       title: 'Dana Idle? Dapatkan Yield',
-      body: 'Dana yang belum dicairkan bisa diputar di Blend Protocol dan menghasilkan bunga hingga 8,5% APY — berjalan per detik di blockchain.',
+      body: 'Dana yang belum dicairkan bisa diputar di Blend Protocol dan menghasilkan bunga hingga 8,5% APY.',
       tag: 'Blend Protocol',
     },
     {
-      icon: '⚡',
+      icon: 'IconBolt',
       title: 'Settlement dalam Detik',
-      body: 'Stellar menyelesaikan transaksi dalam &lt;5 detik — bukan hitungan jam, bukan hari kerja. Verifiable langsung di Stellar Explorer.',
+      body: 'Stellar menyelesaikan transaksi dalam &lt;5 detik, bukan hitungan jam, atau hari kerja. Setiap transaksi transparan di Stellar Explorer.',
       tag: 'Stellar Network',
     },
     {
-      icon: '🔍',
+      icon: 'IconBrandStellar',
       title: 'Transparan & Dapat Diverifikasi',
-      body: 'Setiap transaksi punya hash on-chain yang bisa kamu cek sendiri. Tidak ada biaya tersembunyi, tidak ada kurs gelap.',
+      body: 'Setiap transaksi punya hash on-chain yang bisa anda cek sendiri. Tidak ada biaya tersembunyi, tidak ada kurs gelap.',
       tag: 'On-chain',
     },
     {
-      icon: '🏦',
+      icon: 'IconBuildingBank',
       title: 'Cairkan ke Rekening Bank',
-      body: 'Penerima di Indonesia bisa tarik dana langsung ke BCA, BNI, BRI, Mandiri, dan Permata — dalam Rupiah, tanpa perlu tahu soal kripto.',
+      body: 'Penerima di Indonesia bisa tarik dana langsung ke BCA, BNI, BRI, Mandiri, dan Permata dalam Rupiah.',
       tag: 'Off-ramp IDR',
     },
     {
-      icon: '🔐',
+      icon: 'IconLockPassword',
       title: 'Login Tanpa Password Ribet',
-      body: 'Daftar dengan email, akun Stellar dikelola otomatis di backend. Tidak perlu simpan seed phrase, tidak perlu pasang wallet extension.',
+      body: 'Daftar dengan email, Alamat akun dibuat otomatis. Anda bisa langsung kirim ke alamat yang ada inginkan',
       tag: 'Custodial-lite',
     },
   ]
@@ -364,8 +386,18 @@ function FeaturesSection() {
               className={`feature-card card ${i === 1 ? 'feature-card--highlight' : ''}`}
               style={{ animationDelay: `${i * 80}ms` }}
             >
-              <div className="feature-card__icon" aria-hidden="true">{f.icon}</div>
-              <span className="tag feature-card__tag">{f.tag}</span>
+              <div className="feature-card__header">
+                 <span className="tag feature-card__tag">{f.tag}</span>
+                <div className="feature-card__icon" aria-hidden="true">{
+                  f.icon === 'IconAffiliate' ? <IconAffiliate size={32} /> :
+                    f.icon === 'IconPigMoney' ? <IconPigMoney size={32} /> :
+                      f.icon === 'IconBolt' ? <IconBolt size={32} /> :
+                        f.icon === 'IconBuildingBank' ? <IconBuildingBank size={32} /> :
+                          f.icon === 'IconLockPassword' ? <IconLockPassword size={32} /> :
+                            <IconBrandStellar size={32} />
+                }</div>
+
+              </div>
               <h3 className="heading-sm feature-card__title">{f.title}</h3>
               <p className="feature-card__body" dangerouslySetInnerHTML={{ __html: f.body }} />
             </div>
@@ -381,10 +413,10 @@ function HowSection() {
   const { ref, inView } = useInView()
 
   const steps = [
-    { n: '01', actor: '🇲🇾 Pengirim', title: 'Daftar & Top Up', body: 'Buat akun dengan email. Akun Stellar provisioned otomatis. Isi saldo MYR (simulasi testnet).' },
-    { n: '02', actor: '🇲🇾 Pengirim', title: 'Tentukan Penerima & Porsi', body: 'Pilih satu atau lebih penerima, atur berapa persen untuk masing-masing. Bisa kirim ke 5 penerima sekaligus.' },
-    { n: '03', actor: '⚡ Stellar', title: 'Settlement Instan', body: 'Transaksi dikirim ke Stellar Network dan selesai dalam &lt;5 detik. Hash on-chain langsung tersedia.' },
-    { n: '04', actor: '🇮🇩 Penerima', title: 'Terima & Pilih', body: 'Penerima bisa langsung cairkan ke rekening bank IDR, atau simpan di Blend untuk dapatkan yield.' },
+    { n: '01', actor: '🇲🇾 Pengirim', title: 'Daftar & Top Up', body: 'Buat akun dengan email. Akun anda akan dibuat otomatis dibuat dan memiliki alamat. Isi saldo MYR.' },
+    { n: '02', actor: '🇲🇾 Pengirim', title: 'Tentukan Penerima & Porsi', body: 'Pilih satu atau lebih penerima, atur berapa persen untuk masing-masing. Bisa kirim hingga 5 penerima sekaligus.' },
+    { n: '03', actor: 'Stellar Network', title: 'Settlement Instan', body: 'Transaksi dikirim ke Stellar Network dan selesai dalam &lt;5 detik. Transaksi anda langsung terekam di jaringan stellar dan bisa dicek kapan saja.' },
+    { n: '04', actor: '🇮🇩 Penerima', title: 'Terima & Pilih', body: 'Penerima bisa langsung cairkan ke rekening bank dalam IDR, atau simpan di Blend untuk dapatkan yield.' },
   ]
 
   return (
@@ -394,7 +426,7 @@ function HowSection() {
         <div className={`how-header ${inView ? 'anim-in' : ''}`}>
           <span className="tag">Cara Kerja</span>
           <h2 id="how-heading" className="heading-lg">
-            Empat Langkah.<br />Satu Transaksi.
+            4 Langkah.<br />1 Transaksi.
           </h2>
         </div>
 

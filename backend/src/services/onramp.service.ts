@@ -26,6 +26,7 @@ export interface OnRampResult {
   stellarTxHash: string;
   amountMYR: number;
   amountTESTUSD: string;
+  bonusUSDC: string;
   exchangeRate: number;
   recipientStellarAddress: string;
 }

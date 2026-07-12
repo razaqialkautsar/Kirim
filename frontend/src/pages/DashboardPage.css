@@ -195,9 +195,13 @@
 
 .tab-btn {
   flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   padding: 10px var(--spacing-16);
   border-radius: 22px;
-  font-size: var(--text-body-sm);
+  font-size: var(--text-body-md);
   font-weight: 500;
   font-family: var(--font-body);
   color: var(--color-slate);
@@ -463,6 +467,13 @@
   animation: fadeIn 0.4s ease-out;
 }
 
+.empty-state__main{
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-8);
+  font-size: var(--text-body-md);
+  color: var(--color-slate);    
+}
 /* ── Responsive ───────────────────────────────────────────────────────── */
 @media (max-width: 900px) {
   .dashboard-body {

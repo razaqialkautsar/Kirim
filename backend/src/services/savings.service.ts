@@ -4,7 +4,7 @@ import {
   BASE_FEE,
   Address,
   nativeToScVal,
-  SorobanRpc,
+  rpc,
 } from "@stellar/stellar-sdk";
 import { supabase } from "../config/supabase.js";
 import {
@@ -100,16 +100,16 @@ export async function depositToSavings(
   // --- Simulasi (WAJIB untuk Soroban) ---
   const simResult = await sorobanServer.simulateTransaction(transaction);
 
-  if (SorobanRpc.Api.isSimulationError(simResult)) {
+  if (rpc.Api.isSimulationError(simResult)) {
     const reason =
       "error" in simResult ? String(simResult.error) : "Simulasi gagal";
     throw new Error(`Simulasi Soroban deposit_to_blend gagal: ${reason}`);
   }
 
-  // Gabungkan hasil simulasi ke transaksi
-  const preparedTx = SorobanRpc.assembleTransaction(
+  // Gabungkan (resource fee & auth data)
+  const preparedTx = rpc.assembleTransaction(
     transaction,
-    simResult
+    simResult as any
   ).build();
 
   // Sign transaksi
