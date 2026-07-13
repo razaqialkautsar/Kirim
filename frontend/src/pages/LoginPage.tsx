@@ -20,7 +20,7 @@ export function LoginPage() {
       await signIn(email, password)
       navigate('/dashboard')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login gagal. Periksa email dan password kamu.')
+      setError(err instanceof Error ? err.message : 'Login failed. Check your email and password.')
     } finally {
       setLoading(false)
     }
@@ -28,7 +28,7 @@ export function LoginPage() {
 
   return (
     <div className="auth-layout">
-      {/* Kiri: Form */}
+      {/* Left: Form */}
       <div className="auth-form-panel">
         <div className="auth-form-inner">
           <div className="auth-brand">
@@ -37,20 +37,20 @@ export function LoginPage() {
           </div>
 
           <div className="auth-header">
-            <h1 className="heading-sm">Masuk</h1>
+            <h1 className="heading-sm">Log In</h1>
             <p className="auth-sub">
-              Selamat datang kembali. Masuk untuk lihat saldo dan kirim uang.
+              Welcome back. Log in to check your balance and send money.
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="auth-form" noValidate>
             <div className="form-group">
-              <label htmlFor="login-email" className="form-label">Alamat Email</label>
+              <label htmlFor="login-email" className="form-label">Email Address</label>
               <input
                 id="login-email"
                 type="email"
                 className={`form-input ${error ? 'error' : ''}`}
-                placeholder="kamu@email.com"
+                placeholder="you@email.com"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
@@ -64,7 +64,7 @@ export function LoginPage() {
                 id="login-password"
                 type="password"
                 className={`form-input ${error ? 'error' : ''}`}
-                placeholder="Password kamu"
+                placeholder="Your password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
@@ -84,35 +84,35 @@ export function LoginPage() {
               className="btn-primary auth-cta"
               disabled={loading}
             >
-              {loading ? <><span className="spinner" style={{ borderTopColor: '#fff' }} /> Masuk...</> : 'Masuk ke Akun'}
+              {loading ? <><span className="spinner" style={{ borderTopColor: '#fff' }} /> Logging in...</> : 'Log In'}
             </button>
           </form>
 
           <p className="auth-switch">
-            Belum punya akun?{' '}
-            <Link to="/signup" className="auth-link">Daftar gratis</Link>
+            Don't have an account?{' '}
+            <Link to="/signup" className="auth-link">Sign up for free</Link>
           </p>
         </div>
       </div>
 
-      {/* Kanan: Inverted panel */}
+      {/* Right: Inverted panel */}
       <div className="auth-hero-panel">
         <div className="auth-hero-inner">
-          <div className="auth-hero-tag tag">Kirim untuk PMI</div>
+          <div className="auth-hero-tag tag">Kirim for Migrant Workers</div>
           <h2 className="auth-hero-heading display">
-            Kirim<br />Uang.<br />Detik<br />Ini.
+            Send<br />Money.<br />Right<br />Now.
           </h2>
           <p className="auth-hero-sub">
-            Satu akun. Kirim ke banyak orang sekaligus. Biaya mendekati nol.
+            One account. Send to multiple people at once. Near-zero fees.
           </p>
           <div className="auth-stats">
             <div className="auth-stat">
               <span className="auth-stat-value">{'< 10s'}</span>
-              <span className="auth-stat-label">Waktu kirim</span>
+              <span className="auth-stat-label">Transfer time</span>
             </div>
             <div className="auth-stat">
               <span className="auth-stat-value">~0%</span>
-              <span className="auth-stat-label">Biaya vs 4.8% bank</span>
+              <span className="auth-stat-label">Fee vs 4.8% bank fee</span>
             </div>
           </div>
         </div>

@@ -21,7 +21,7 @@ function ToastContainer({ toasts, onClose }: { toasts: Toast[]; onClose: (id: nu
       {toasts.map(t => (
         <div key={t.id} className={`toast toast-${t.type}`} role="alert">
           <span>{t.message}</span>
-          <button className="toast-close" onClick={() => onClose(t.id)} aria-label="Tutup">×</button>
+          <button className="toast-close" onClick={() => onClose(t.id)} aria-label="Close">×</button>
         </div>
       ))}
     </div>
@@ -43,18 +43,18 @@ function RecipientSlot({
   return (
     <div className="recipient-slot">
       <div className="recipient-slot-header">
-        <span className="mono" style={{ color: 'var(--color-smoke)' }}>Penerima {index + 1}</span>
+        <span className="mono" style={{ color: 'var(--color-smoke)' }}>Recipient {index + 1}</span>
         {canRemove && (
           <button
             type="button"
             className="recipient-remove"
             onClick={onRemove}
-            aria-label="Hapus penerima"
+            aria-label="Remove recipient"
           >×</button>
         )}
       </div>
       <div className="form-group">
-        <label className="form-label">Alamat Stellar</label>
+        <label className="form-label">Stellar Address</label>
         <input
           type="text"
           className="form-input"
@@ -65,7 +65,7 @@ function RecipientSlot({
         />
       </div>
       <div className="form-group">
-        <label className="form-label">Porsi (%)</label>
+        <label className="form-label">Portion (%)</label>
         <div className="bps-row">
           <input
             type="range"
@@ -89,8 +89,8 @@ function TransactionRow({ tx }: { tx: DashboardData['history'][0] }) {
 
   const typeLabel: Record<string, string> = {
     onramp: 'Top Up',
-    disbursement: 'Kirim',
-    offramp: 'Cairkan',
+    disbursement: 'Send',
+    offramp: 'Withdraw',
   }
 
   // Support both camelCase (backend) and snake_case (legacy)
@@ -101,7 +101,7 @@ function TransactionRow({ tx }: { tx: DashboardData['history'][0] }) {
 
   const statusEl = (
     <span className={`status-${tx.status}`}>
-      {tx.status === 'completed' ? 'Selesai' : tx.status === 'pending' ? 'Diproses' : 'Gagal'}
+      {tx.status === 'completed' ? 'Completed' : tx.status === 'pending' ? 'Processing' : 'Failed'}
     </span>
   )
 
@@ -181,7 +181,7 @@ function KirimTab({ onSuccess }: { onSuccess: () => void }) {
     setSuccess('')
 
     if (totalBps !== 10000) {
-      setError(`Total porsi harus 100%. Saat ini: ${(totalBps / 100).toFixed(0)}%`)
+      setError(`Total portion must be 100%. Currently: ${(totalBps / 100).toFixed(0)}%`)
       return
     }
 
@@ -193,13 +193,13 @@ function KirimTab({ onSuccess }: { onSuccess: () => void }) {
       }))
 
       const res = await kirimApi.send(recipients, amount)
-      setSuccess(`Berhasil dikirim! Hash: ${res.stellarTxHash?.slice(0, 12)}…`)
+      setSuccess(`Sent successfully! Hash: ${res.stellarTxHash?.slice(0, 12)}…`)
 
       setSlots([{ address: '', bps: 10000 }])
       setAmount('')
       onSuccess()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Pengiriman gagal.')
+      setError(err instanceof Error ? err.message : 'Transfer failed.')
     } finally {
       setLoading(false)
     }
@@ -208,14 +208,14 @@ function KirimTab({ onSuccess }: { onSuccess: () => void }) {
   return (
     <form onSubmit={handleSubmit} className="tab-form">
       <div className="form-group">
-        <label htmlFor="kirim-amount" className="form-label">Jumlah (TESTUSD)</label>
+        <label htmlFor="kirim-amount" className="form-label">Amount (TESTUSD)</label>
         <input
           id="kirim-amount"
           type="number"
           min="0.01"
           step="0.01"
           className="form-input"
-          placeholder="Contoh: 100"
+          placeholder="Example: 100"
           value={amount}
           onChange={e => setAmount(e.target.value)}
           required
@@ -224,9 +224,9 @@ function KirimTab({ onSuccess }: { onSuccess: () => void }) {
 
       <div className="recipients-section">
         <div className="recipients-header">
-          <span className="form-label">Penerima</span>
+          <span className="form-label">Recipient</span>
           <span className={`bps-total mono ${totalBps !== 10000 ? 'bps-total-error' : 'bps-total-ok'}`}>
-            Total: {(totalBps / 100).toFixed(0)}% {totalBps === 10000 ? '✓' : `(kurang ${((10000 - totalBps) / 100).toFixed(0)}%)`}
+            Total: {(totalBps / 100).toFixed(0)}% {totalBps === 10000 ? '✓' : `(missing ${((10000 - totalBps) / 100).toFixed(0)}%)`}
           </span>
         </div>
 
@@ -243,7 +243,7 @@ function KirimTab({ onSuccess }: { onSuccess: () => void }) {
 
         {slots.length < 5 && (
           <button type="button" className="btn-ghost add-recipient-btn" onClick={addRecipient}>
-            + Tambah Penerima
+            + Add Recipient
           </button>
         )}
       </div>
@@ -254,7 +254,7 @@ function KirimTab({ onSuccess }: { onSuccess: () => void }) {
       {loading && (
         <div className="soroban-loading-hint">
           <span className="spinner" style={{ borderTopColor: 'var(--color-mint)' }} />
-          <span>Menunggu konfirmasi Soroban blockchain (3–10 detik)…</span>
+          <span>Waiting for Soroban blockchain confirmation (3–10 seconds)…</span>
         </div>
       )}
 
@@ -264,7 +264,7 @@ function KirimTab({ onSuccess }: { onSuccess: () => void }) {
         className="btn-primary"
         disabled={loading || !isValid}
       >
-        {loading ? <>Mengirim...</> : 'Kirim Sekarang'}
+        {loading ? <>Sending...</> : 'Send Now'}
       </button>
     </form>
   )
@@ -304,14 +304,14 @@ function CairkanTab({ onSuccess }: { onSuccess: () => void }) {
         amountTESTUSD: Number(amountUSD),
       })
       const idrFormatted = res.data.amountIDR.toLocaleString('id-ID')
-      setSuccess(`${res.message} Dana ≈ Rp ${idrFormatted} akan masuk ke rekening.`)
+      setSuccess(`${res.message} Funds ≈ Rp ${idrFormatted} will be transferred to your account.`)
 
       setAmountUSD('')
       setAccountNumber('')
       setAccountName('')
       onSuccess()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Pencairan gagal.')
+      setError(err instanceof Error ? err.message : 'Withdrawal failed.')
     } finally {
       setLoading(false)
     }
@@ -320,25 +320,25 @@ function CairkanTab({ onSuccess }: { onSuccess: () => void }) {
   return (
     <form onSubmit={handleSubmit} className="tab-form">
       <div className="form-group">
-        <label htmlFor="cairkan-amount" className="form-label">Jumlah Cairkan (TESTUSD)</label>
+        <label htmlFor="cairkan-amount" className="form-label">Withdraw Amount (TESTUSD)</label>
         <input
           id="cairkan-amount"
           type="number"
           min="1"
           step="0.01"
           className="form-input"
-          placeholder="Contoh: 50"
+          placeholder="Example: 50"
           value={amountUSD}
           onChange={e => setAmountUSD(e.target.value)}
           required
         />
         {idrEstimate && (
-          <span className="form-hint">≈ Rp {idrEstimate} (estimasi kurs Rp15.800)</span>
+          <span className="form-hint">≈ Rp {idrEstimate} (est. rate Rp15,800)</span>
         )}
       </div>
 
       <div className="form-group">
-        <label htmlFor="cairkan-bank" className="form-label">Tujuan Pencairan</label>
+        <label htmlFor="cairkan-bank" className="form-label">Withdrawal Destination</label>
         <select
           id="cairkan-bank"
           className="form-input"
@@ -350,12 +350,12 @@ function CairkanTab({ onSuccess }: { onSuccess: () => void }) {
       </div>
 
       <div className="form-group">
-        <label htmlFor="cairkan-accnum" className="form-label">Nomor Rekening</label>
+        <label htmlFor="cairkan-accnum" className="form-label">Account Number</label>
         <input
           id="cairkan-accnum"
           type="text"
           className="form-input"
-          placeholder="Nomor rekening"
+          placeholder="Account number"
           value={accountNumber}
           onChange={e => setAccountNumber(e.target.value)}
           required
@@ -363,12 +363,12 @@ function CairkanTab({ onSuccess }: { onSuccess: () => void }) {
       </div>
 
       <div className="form-group">
-        <label htmlFor="cairkan-accname" className="form-label">Nama Pemilik Rekening</label>
+        <label htmlFor="cairkan-accname" className="form-label">Account Holder Name</label>
         <input
           id="cairkan-accname"
           type="text"
           className="form-input"
-          placeholder="Sesuai nama di rekening"
+          placeholder="As on bank account"
           value={accountName}
           onChange={e => setAccountName(e.target.value)}
           required
@@ -384,7 +384,7 @@ function CairkanTab({ onSuccess }: { onSuccess: () => void }) {
         className="btn-primary"
         disabled={loading}
       >
-        {loading ? <><span className="spinner" style={{ borderTopColor: '#fff' }} /> Memproses...</> : 'Cairkan Dana'}
+        {loading ? <><span className="spinner" style={{ borderTopColor: '#fff' }} /> Processing...</> : 'Withdraw Funds'}
       </button>
     </form>
   )
@@ -427,13 +427,13 @@ function TabunganTab({ addToast }: { addToast: (msg: string, type: Toast['type']
     setDepositing(true)
     try {
       const res = await kirimApi.depositToSavings(Number(depositAmount))
-      addToast(`✅ Deposit ${depositAmount} TESTUSD ke Blend berhasil!`, 'success')
+      addToast(`✅ Deposit ${depositAmount} TESTUSD to Blend successful!`, 'success')
       setDepositAmount('')
       // Force refresh
       await fetchSavings()
       console.log('[savings] deposit berhasil:', res.data.stellarTxHash)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Deposit gagal.')
+      setError(err instanceof Error ? err.message : 'Deposit failed.')
     } finally {
       setDepositing(false)
     }
@@ -445,11 +445,11 @@ function TabunganTab({ addToast }: { addToast: (msg: string, type: Toast['type']
     setWithdrawing(true)
     try {
       await kirimApi.withdrawFromSavings(Number(withdrawAmount))
-      addToast(`💰 Penarikan ${withdrawAmount} TESTUSD berhasil!`, 'info')
+      addToast(`💰 Withdrawal of ${withdrawAmount} TESTUSD successful!`, 'info')
       setWithdrawAmount('')
       await fetchSavings()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Penarikan gagal.')
+      setError(err instanceof Error ? err.message : 'Withdrawal failed.')
     } finally {
       setWithdrawing(false)
     }
@@ -476,36 +476,36 @@ function TabunganTab({ addToast }: { addToast: (msg: string, type: Toast['type']
       ) : position ? (
         <div className="savings-position-card">
           <div className="savings-row">
-            <span className="form-label">Modal Disetor</span>
+            <span className="form-label">Deposited Capital</span>
             <span className="mono">{position.amountDeposited.toFixed(2)} TESTUSD</span>
           </div>
           <div className="savings-row savings-row-highlight">
-            <span className="form-label">Nilai Sekarang</span>
+            <span className="form-label">Current Value</span>
             <span className="mono savings-current-value">
               {position.currentValue.toFixed(7)} TESTUSD
             </span>
           </div>
           <div className="savings-row">
-            <span className="form-label">Bunga Diperoleh</span>
+            <span className="form-label">Yield Earned</span>
             <span className="mono stat-highlight">
               +{position.yieldEarned.toFixed(7)} TESTUSD
             </span>
           </div>
           <div className="savings-row">
-            <span className="form-label">Mulai Nabung</span>
+            <span className="form-label">Started Saving</span>
             <span className="mono">{new Date(position.depositedAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
           </div>
           <div className="savings-onchain-badge">
-            ✅ Terverifikasi On-Chain di Blend Protocol
+            ✅ Verified On-Chain on Blend Protocol
           </div>
         </div>
       ) : (
         <div className="empty-state">
           <p className='empty-state__main'>
             <IconZzz />
-             Belum ada tabungan aktif.
+             No active savings.
           </p>
-          <p className="form-hint">Deposit TESTUSD/USDC ke Blend dan dapatkan bunga <strong>8.5% APY</strong> </p>
+          <p className="form-hint">Deposit TESTUSD/USDC to Blend and earn <strong>8.5% APY</strong></p>
         </div>
       )}
 
@@ -514,7 +514,7 @@ function TabunganTab({ addToast }: { addToast: (msg: string, type: Toast['type']
       {/* ─ Form Deposit ─ */}
       <form onSubmit={handleDeposit} className="savings-action-form">
         <div className="form-group">
-          <label htmlFor="savings-deposit-amount" className="form-label">Deposit ke Blend</label>
+          <label htmlFor="savings-deposit-amount" className="form-label">Deposit to Blend</label>
           <div className="topup-row">
             <input
               id="savings-deposit-amount"
@@ -522,7 +522,7 @@ function TabunganTab({ addToast }: { addToast: (msg: string, type: Toast['type']
               min="1"
               step="0.01"
               className="form-input"
-              placeholder="Jumlah TESTUSD/USDC"
+              placeholder="TESTUSD/USDC Amount"
               value={depositAmount}
               onChange={e => setDepositAmount(e.target.value)}
               required
@@ -535,12 +535,12 @@ function TabunganTab({ addToast }: { addToast: (msg: string, type: Toast['type']
               disabled={depositing || !depositAmount}
               style={{ whiteSpace: 'nowrap' }}
             >
-              {depositing ? <><span className="spinner" style={{ width: 14, height: 14 }} /> Menabung...</> : 'Deposit'}
+              {depositing ? <><span className="spinner" style={{ width: 14, height: 14 }} /> Saving...</> : 'Deposit'}
             </button>
           </div>
           {depositing && (
             <p className="form-hint" style={{ marginTop: 6 }}>
-              ⏳ Menunggu konfirmasi Soroban (3–10 detik)…
+              ⏳ Waiting for Soroban confirmation (3–10 seconds)…
             </p>
           )}
         </div>
@@ -550,7 +550,7 @@ function TabunganTab({ addToast }: { addToast: (msg: string, type: Toast['type']
       {position && (
         <form onSubmit={handleWithdraw} className="savings-action-form">
           <div className="form-group">
-            <label htmlFor="savings-withdraw-amount" className="form-label">Tarik Tabungan</label>
+            <label htmlFor="savings-withdraw-amount" className="form-label">Withdraw Savings</label>
             <div className="topup-row">
               <input
                 id="savings-withdraw-amount"
@@ -559,7 +559,7 @@ function TabunganTab({ addToast }: { addToast: (msg: string, type: Toast['type']
                 max={position.amountDeposited}
                 step="0.01"
                 className="form-input"
-                placeholder={`Maks ${position.amountDeposited.toFixed(2)} TESTUSD`}
+                placeholder={`Max ${position.amountDeposited.toFixed(2)} TESTUSD`}
                 value={withdrawAmount}
                 onChange={e => setWithdrawAmount(e.target.value)}
                 required
@@ -572,7 +572,7 @@ function TabunganTab({ addToast }: { addToast: (msg: string, type: Toast['type']
                 disabled={withdrawing || !withdrawAmount}
                 style={{ whiteSpace: 'nowrap' }}
               >
-                {withdrawing ? <><span className="spinner" style={{ width: 14, height: 14 }} /> Menarik...</> : 'Tarik'}
+                {withdrawing ? <><span className="spinner" style={{ width: 14, height: 14 }} /> Withdrawing...</> : 'Withdraw'}
               </button>
             </div>
           </div>
@@ -587,8 +587,8 @@ function RiwayatTab({ history }: { history: DashboardData['history'] }) {
   if (history.length === 0) {
     return (
       <div className="empty-state">
-        <p>Belum ada transaksi.</p>
-        <p className="form-hint">Mulai dengan top up atau kirim ke penerima.</p>
+        <p>No transactions yet.</p>
+        <p className="form-hint">Start by topping up or sending to a recipient.</p>
       </div>
     )
   }
@@ -657,30 +657,30 @@ export function DashboardPage() {
     if (!socket) return
 
     const handleOnrampCompleted = (d: { amountMYR: number; amountTESTUSD: string; bonusUSDC: string }) => {
-      addToast(`💵 Top-up berhasil! ${d.amountTESTUSD} TESTUSD masuk ke dompet.`, 'success')
+      addToast(`💵 Top-up successful! ${d.amountTESTUSD} TESTUSD added to your wallet.`, 'success')
       if (parseFloat(d.bonusUSDC) > 0) {
-        setTimeout(() => addToast(`🎁 Bonus ${d.bonusUSDC} USDC gratis sudah masuk! Coba fitur Tabungan Blend.`, 'bonus'), 1000)
+        setTimeout(() => addToast(`🎁 Free ${d.bonusUSDC} USDC bonus received! Try the Blend Savings feature.`, 'bonus'), 1000)
       }
       fetchDashboard()
     }
 
     const handleTxCompleted = (d: { totalAmount: number }) => {
-      addToast(`✅ Pengiriman ${d.totalAmount} TESTUSD berhasil dikonfirmasi on-chain!`, 'success')
+      addToast(`✅ Transfer of ${d.totalAmount} TESTUSD successfully confirmed on-chain!`, 'success')
       fetchDashboard()
     }
 
     const handleTxReceived = (d: { amount: number }) => {
-      addToast(`📩 Kamu menerima ${d.amount} TESTUSD dari pengirim!`, 'info')
+      addToast(`📩 You received ${d.amount} TESTUSD from sender!`, 'info')
       fetchDashboard()
     }
 
     const handleOfframpCompleted = (d: { amountIDR: number; bankCode: string }) => {
-      addToast(`🏦 Pencairan ke ${d.bankCode} berhasil! Rp ${d.amountIDR.toLocaleString('id-ID')} sedang diproses.`, 'success')
+      addToast(`🏦 Withdrawal to ${d.bankCode} successful! Rp ${d.amountIDR.toLocaleString('id-ID')} is processing.`, 'success')
       fetchDashboard()
     }
 
     const handleSavingsDeposited = (d: { totalDeposited: number }) => {
-      addToast(`🌱 Deposit ${d.totalDeposited} TESTUSD ke Blend on-chain dikonfirmasi!`, 'success')
+      addToast(`🌱 Deposit of ${d.totalDeposited} TESTUSD to Blend confirmed on-chain!`, 'success')
     }
 
     socket.on('onramp:completed', handleOnrampCompleted)
@@ -725,7 +725,7 @@ export function DashboardPage() {
         <span className="dashboard-brand">KIRIM</span>
         <div className="dashboard-nav-right">
           <span className="dashboard-user mono">{user?.email}</span>
-          <button id="logout-btn" className="btn-ghost" onClick={handleLogout}>Keluar</button>
+          <button id="logout-btn" className="btn-ghost" onClick={handleLogout}>Log Out</button>
         </div>
       </nav>
 
@@ -733,7 +733,7 @@ export function DashboardPage() {
         {/* ── Sidebar ── */}
         <aside className="dashboard-sidebar">
           <div className="card sidebar-balance-card">
-            <div className="form-label">Saldo TESTUSD</div>
+            <div className="form-label">TESTUSD Balance</div>
             {loadingData ? (
               <span className="spinner" style={{ margin: '8px 0' }} />
             ) : (
@@ -757,7 +757,7 @@ export function DashboardPage() {
                   style={{ padding: '4px 10px', fontSize: '12px' }}
                   onClick={copyAddress}
                 >
-                  {copied ? '✓ Disalin' : 'Salin'}
+                  {copied ? '✓ Copied' : 'Copy'}
                 </button>
               </div>
             </div>
@@ -766,11 +766,11 @@ export function DashboardPage() {
           {data?.metrics && (
             <div className="card sidebar-stats-card">
               <div className="stat-row">
-                <span className="form-label">Jumlah Transaksi Berhasil</span>
+                <span className="form-label">Successful Transactions</span>
                 <span className="mono">{data.metrics.totalTransactions}</span>
               </div>
               <div className="stat-row">
-                <span className="form-label">Total Hemat</span>
+                <span className="form-label">Total Saved</span>
                 <span className="mono stat-highlight">
                   ${data.metrics.totalSavedUSD.toFixed(2)}
                 </span>
@@ -780,7 +780,7 @@ export function DashboardPage() {
                 <span className="mono">{data.metrics.traditionalFeePercent}%</span>
               </div> */}
               <div className="stat-row">
-                <span className="form-label">Biaya Kirim</span>
+                <span className="form-label">Transfer Fee</span>
                 <span className="mono stat-highlight">{data.metrics.kirimFeePercent}%</span>
               </div>
             </div>
@@ -807,10 +807,10 @@ export function DashboardPage() {
                   : t === 'cairkan' ? <IconBuildingBank size={22}/>
                   : t === 'tabungan' ? <IconPigMoney size={22} />
                   : <IconHistory size={22} />}
-                {t === 'kirim' ?  'Kirim'
-                  : t === 'cairkan' ? 'Cairkan'
-                  : t === 'tabungan' ? 'Tabungan'
-                  : 'Riwayat'}
+                {t === 'kirim' ?  'Send'
+                  : t === 'cairkan' ? 'Withdraw'
+                  : t === 'tabungan' ? 'Savings'
+                  : 'History'}
               </button>
             ))}
           </div>
@@ -848,16 +848,16 @@ function TopUpMini({ onSuccess, addToast }: { onSuccess: () => void; addToast: (
     try {
       const res = await kirimApi.onramp(Number(amountMYR))
       const usdAmt = parseFloat(res.amountTESTUSD).toFixed(2)
-      setMsg(`✓ ${usdAmt} TESTUSD masuk`)
+      setMsg(`✓ ${usdAmt} TESTUSD received`)
 
       if (parseFloat(res.bonusUSDC) > 0) {
-        addToast(`🎁 Bonus ${res.bonusUSDC} USDC gratis sudah masuk! Coba fitur Tabungan Blend.`, 'bonus')
+        addToast(`🎁 Free ${res.bonusUSDC} USDC bonus received! Try the Blend Savings feature.`, 'bonus')
       }
 
       setAmountMYR('')
       onSuccess()
     } catch (err) {
-      setMsg(err instanceof Error ? err.message : 'Top up gagal.')
+      setMsg(err instanceof Error ? err.message : 'Top up failed.')
     } finally {
       setLoading(false)
     }
@@ -872,7 +872,7 @@ function TopUpMini({ onSuccess, addToast }: { onSuccess: () => void; addToast: (
           type="number"
           min="1"
           className="form-input"
-          placeholder="Nominal MYR"
+          placeholder="MYR Amount"
           value={amountMYR}
           onChange={e => setAmountMYR(e.target.value)}
           required
@@ -890,7 +890,7 @@ function TopUpMini({ onSuccess, addToast }: { onSuccess: () => void; addToast: (
       </div>
       {amountMYR && (
         <p className="form-hint topup-preview">
-          ≈ {(Number(amountMYR) * 0.22).toFixed(2)} TESTUSD (kurs 0.22)
+          ≈ {(Number(amountMYR) * 0.22).toFixed(2)} TESTUSD (est. rate 0.22)
         </p>
       )}
       {msg && (

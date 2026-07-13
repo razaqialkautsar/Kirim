@@ -58,17 +58,17 @@ function LandingNav() {
   }, [])
 
   return (
-    <nav className={`landing-nav ${scrolled ? 'landing-nav--scrolled' : ''}`} aria-label="Navigasi utama">
+    <nav className={`landing-nav ${scrolled ? 'landing-nav--scrolled' : ''}`} aria-label="Main navigation">
       <div className="landing-nav__inner">
         <span className="landing-nav__brand" aria-label="Kirim">
           <img src={scrolled ? '/logokirimblack.png' : '/logokirimwhite.png'} alt="logo kirim" />
           
         </span>
         <div className="landing-nav__links">
-          <a href="#how" className="landing-nav__link">Cara Kerja</a>
-          <a href="#features" className="landing-nav__link">Fitur</a>
-          <Link to="/login" className="btn-ghost landing-nav__btn">Masuk</Link>
-          <Link to="/signup" className="btn-primary landing-nav__btn">Daftar Gratis</Link>
+          <a href="#how" className="landing-nav__link">How it Works</a>
+          <a href="#features" className="landing-nav__link">Features</a>
+          <Link to="/login" className="btn-ghost landing-nav__btn">Log In</Link>
+          <Link to="/signup" className="btn-primary landing-nav__btn">Sign Up</Link>
         </div>
       </div>
     </nav>
@@ -87,37 +87,37 @@ function HeroSection() {
 
         {/* Headline */}
         <h1 id="hero-heading" className="display hero__headline">
-          Kirim <br />
-          <span className="hero__headline-mint">Uang</span><br />
-          Tanpa Riba Biaya
+          Send <br />
+          <span className="hero__headline-mint">Money</span><br />
+          Without Crazy Fees
         </h1>
 
         <p className="hero__subhead">
-          Transfer ke keluarga di Indonesia dalam hitungan detik dengan biaya mendekati NOL
+          Transfer to your family in Indonesia in seconds with near-ZERO fees
         </p>
 
         {/* CTA row */}
         <div className="hero__cta-row">
           <Link to="/signup" className="btn-primary hero__cta-main" id="hero-cta-signup">
-            Mulai Kirim Sekarang →
+            Start Sending Now →
           </Link>
         </div>
 
         {/* Live ticker bar */}
-        <div className="hero__ticker" aria-label="Metrik kecepatan">
+        <div className="hero__ticker" aria-label="Speed metrics">
           <div className="hero__ticker-item">
-            <span className="hero__ticker-label mono">Waktu Proses</span>
-            <span className="hero__ticker-value">&lt; 5 detik</span>
+            <span className="hero__ticker-label mono">Processing Time</span>
+            <span className="hero__ticker-value">&lt; 5 seconds</span>
           </div>
           <div className="hero__ticker-divider" />
           <div className="hero__ticker-item">
-            <span className="hero__ticker-label mono">Biaya Kirim</span>
+            <span className="hero__ticker-label mono">Transfer Fee</span>
             <span className="hero__ticker-value">≈ Rp 0</span>
           </div>
           <div className="hero__ticker-divider" />
           <div className="hero__ticker-item">
-            <span className="hero__ticker-label mono">Bank tradisional</span>
-            <span className="hero__ticker-value hero__ticker-red">1-3 hari · 4,8%</span>
+            <span className="hero__ticker-label mono">Traditional banks</span>
+            <span className="hero__ticker-value hero__ticker-red">1-3 days · 4.8%</span>
           </div>
         </div>
       </div>
@@ -133,9 +133,9 @@ function StatsSection() {
   const { ref, inView } = useInView()
 
   const stats = [
-    { value: 288, suffix: 'T', prefix: 'Rp', label: 'Remitansi PMI 2025', sub: 'tumbuh 14% dari tahun lalu' },
-    { value: 48, suffix: '%', label: 'Biaya rata-rata hilang', sub: 'di corridor Malaysia → Indonesia adalah 4,80%*' },
-    { value: 39, suffix: ' Juta', label: 'PMI Indonesia', sub: 'mengirim rata-rata Rp64 juta per tahun' },
+    { value: 288, suffix: 'T', prefix: 'Rp', label: 'Migrant Worker Remittances 2025', sub: 'grew 14% from last year' },
+    { value: 48, suffix: '%', label: 'Average Fee Lost', sub: 'in the Malaysia → Indonesia corridor is 4.80%*' },
+    { value: 39, suffix: ' Million', label: 'Indonesian Migrant Workers', sub: 'send an average of Rp64 million per year' },
   ]
 
   return (
@@ -145,11 +145,10 @@ function StatsSection() {
         <div className={`stats-section__header ${inView ? 'anim-in' : ''}`}>
           <span className="tag">Reality Problem</span>
           <h2 id="stats-heading" className="heading-lg stats-section__title">
-            Uang Kamu<br />Susut di Perjalanan
+            Your Money<br />Shrinks on the Way
           </h2>
           <p className="stats-section__desc">
-            Setiap MYR yang anda kirim, sebagian besar hilang sebagai biaya,
-            bukan karena harus, tapi karena belum ada alternatif yang lebih baik.
+            Every MYR you send, a large portion is lost to fees. Not because it has to be, but because there hasn't been a better alternative.
           </p>
         </div>
 
@@ -169,7 +168,7 @@ function StatsSection() {
         </div>
 
         <p className="stats-section__source mono">
-          * Sumber: World Bank Remittance Prices Worldwide
+          * Source: World Bank Remittance Prices Worldwide
         </p>
       </div>
     </section>
@@ -187,20 +186,20 @@ function WhatIsSection() {
         <div className={`whatis-grid ${inView ? 'anim-in' : ''}`}>
           {/* Left: text */}
           <div className="whatis-text">
-            <span className="tag">Apa itu Kirim?</span>
+            <span className="tag">What is Kirim?</span>
             <h2 id="whatis-heading" className="heading-lg whatis-text__title">
-              Infrastruktur<br />Remitansi<br />
-              <span className="whatis-text__accent">Generasi Baru</span>
+              Next-Generation<br />Remittance<br />
+              <span className="whatis-text__accent">Infrastructure</span>
             </h2>
             <p className="whatis-text__body">
-              Kirim bukan aplikasi kripto. Kirim adalah layanan pengiriman uang dari Malaysia ke Indonesia dengan pemanfaatan teknologi kripto melalui jaringan Stellar.
-              Kamu cukup input/top-up MYR,
-              keluarga di Indonesia terima rupiah ke rekening mereka.
+              Kirim isn't a crypto app. It's a money transfer service from Malaysia to Indonesia powered by crypto technology via the Stellar network.
+              You just input/top-up MYR,
+              and your family in Indonesia receives Rupiah straight to their bank accounts.
             </p>
             <div className="whatis-badges">
-              <span className="tag">Cepat</span>
-              <span className="tag">Murah</span>
-              <span className="tag tag-yellow">Transaparan</span>
+              <span className="tag">Fast</span>
+              <span className="tag">Cheap</span>
+              <span className="tag tag-yellow">Transparent</span>
             </div>
           </div>
 
@@ -212,8 +211,8 @@ function WhatIsSection() {
                 <div className="whatis-flow__step">
                   <span className="whatis-flow__icon">🇲🇾</span>
                   <div>
-                    <div className="whatis-flow__title">Pengirim (Malaysia)</div>
-                    <div className="mono whatis-flow__sub">Input MYR · Autentikasi</div>
+                    <div className="whatis-flow__title">Sender (Malaysia)</div>
+                    <div className="mono whatis-flow__sub">Input MYR · Authenticate</div>
                   </div>
                 </div>
                 <div className="whatis-flow__arrow">↓</div>
@@ -221,15 +220,15 @@ function WhatIsSection() {
                   <IconBrandStellar />
                   <div>
                     <div className="whatis-flow__title">Stellar Network</div>
-                    <div className="mono whatis-flow__sub">Sampai dalam &lt;5 detik · biaya ≈ $0</div>
+                    <div className="mono whatis-flow__sub">Arrives in &lt;5 seconds · fee ≈ $0</div>
                   </div>
                 </div>
                 <div className="whatis-flow__arrow">↓</div>
                 <div className="whatis-flow__step">
                   <span className="whatis-flow__icon">🇮🇩</span>
                   <div>
-                    <div className="whatis-flow__title">Penerima (Indonesia)</div>
-                    <div className="mono whatis-flow__sub">Terima IDR · Rekening bank / e-wallet</div>
+                    <div className="whatis-flow__title">Receiver (Indonesia)</div>
+                    <div className="mono whatis-flow__sub">Receive IDR · Bank account / e-wallet</div>
                   </div>
                 </div>
               </div>
@@ -253,36 +252,36 @@ function CostSection() {
       ref={ref as React.RefObject<HTMLElement>}>
       <div className="page-container">
         <div className={`cost-header ${inView ? 'anim-in' : ''}`}>
-          <span className="tag tag-yellow">Perbandingan</span>
+          <span className="tag tag-yellow">Comparison</span>
           <h2 id="cost-heading" className="heading-lg">
-            Berapa yang Kamu<br />Hemat dengan Kirim?
+            How much do you<br />Save with Kirim?
           </h2>
         </div>
 
         <div className={`cost-comparison ${inView ? 'anim-in' : ''}`}>
           {/* Traditional */}
           <div className="cost-card cost-card--bad">
-            <div className="cost-card__label mono">Bank Tradisional</div>
+            <div className="cost-card__label mono">Traditional Banks</div>
             <div className="cost-card__amount display">
               MYR {(amount * tradFeeRate).toFixed(0)}
             </div>
-            <div className="cost-card__sublabel">hilang sebagai biaya per MYR1,000</div>
+            <div className="cost-card__sublabel">lost to fees per MYR 1,000</div>
             <ul className="cost-card__list">
               <li className='cost-card__list__item'> 
                 <IconHourglassHigh />
-                1–3 hari Kerja
+                1–3 Business days
               </li>
               <li className='cost-card__list__item'>
                 <IconMoodAngry />
-                Antri & formulir fisik
+                Queues & physical forms
               </li>
               <li className='cost-card__list__item'> 
                 <IconBusinessplan />
-                4,80% rata-rata biaya
+                4.80% average fee
               </li>
               <li className='cost-card__list__item'>
                 <IconCurrencyDollarOff />
-                 Kurs tidak transparan
+                 Non-transparent exchange rates
               </li>
             </ul>
           </div>
@@ -296,27 +295,27 @@ function CostSection() {
             <div className="cost-card__amount display cost-card__amount--mint">
               MYR ≈{(amount * kirimFeeRate).toFixed(0)}
             </div>
-            <div className="cost-card__sublabel">biaya jaringan per MYR1,000</div>
+            <div className="cost-card__sublabel">network fees per MYR 1,000</div>
             <ul className="cost-card__list">
               <li className='cost-card__list__item'>
                 <IconBolt />
-                 &lt; 5 detik settlement
+                 &lt; 5 seconds settlement
               </li>
               <li className='cost-card__list__item'>
                 <IconDeviceMobile />
-                 Dari Ponsel anda, kapan saja
+                 From your phone, anytime
               </li>
               <li className='cost-card__list__item'> 
                 <IconCurrencyDollarOff />
-                Biaya mendekati NOL
+                Near-ZERO fees
               </li>
               <li className='cost-card__list__item'>
                 <IconBrandStellar />
-                Transparan di blockchain
+                Transparent on the blockchain
               </li>
             </ul>
             <div className="cost-card__savings">
-              Hemat ≈ <strong>MYR {(amount * tradFeeRate).toFixed(0)}</strong> per kiriman
+              Save ≈ <strong>MYR {(amount * tradFeeRate).toFixed(0)}</strong> per transfer
             </div>
           </div>
         </div>
@@ -332,38 +331,38 @@ function FeaturesSection() {
   const features = [
     {
       icon: 'IconAffiliate',
-      title: 'Split ke Banyak Penerima',
-      body: 'Satu kiriman bisa dibagi ke istri, orang tua, dan tabungan anak sekaligus dalam satu kali transaksi, atomik, tidak bisa gagal sebagian.',
+      title: 'Split to Multiple Recipients',
+      body: 'One transfer can be split to your wife, parents, and kids\' savings all at once in a single, atomic transaction that won\'t partially fail.',
       tag: 'Multi-recipient',
     },
     {
       icon: 'IconPigMoney',
-      title: 'Dana Idle? Dapatkan Yield',
-      body: 'Dana yang belum dicairkan bisa diputar di Blend Protocol dan menghasilkan bunga hingga 8,5% APY.',
+      title: 'Idle Funds? Earn Yield',
+      body: 'Uncashed funds can be put to work on Blend Protocol, earning up to 8.5% APY in interest.',
       tag: 'Blend Protocol',
     },
     {
       icon: 'IconBolt',
-      title: 'Settlement dalam Detik',
-      body: 'Stellar menyelesaikan transaksi dalam &lt;5 detik, bukan hitungan jam, atau hari kerja. Setiap transaksi transparan di Stellar Explorer.',
+      title: 'Settlement in Seconds',
+      body: 'Stellar settles transactions in &lt;5 seconds, not hours or business days. Every transaction is transparent on Stellar Explorer.',
       tag: 'Stellar Network',
     },
     {
       icon: 'IconBrandStellar',
-      title: 'Transparan & Dapat Diverifikasi',
-      body: 'Setiap transaksi punya hash on-chain yang bisa anda cek sendiri. Tidak ada biaya tersembunyi, tidak ada kurs gelap.',
+      title: 'Transparent & Verifiable',
+      body: 'Every transaction has an on-chain hash you can verify yourself. No hidden fees, no shady exchange rates.',
       tag: 'On-chain',
     },
     {
       icon: 'IconBuildingBank',
-      title: 'Cairkan ke Rekening Bank',
-      body: 'Penerima di Indonesia bisa tarik dana langsung ke BCA, BNI, BRI, Mandiri, dan Permata dalam Rupiah.',
+      title: 'Withdraw to Bank Account',
+      body: 'Receivers in Indonesia can withdraw funds directly to BCA, BNI, BRI, Mandiri, and Permata in Rupiah.',
       tag: 'Off-ramp IDR',
     },
     {
       icon: 'IconLockPassword',
-      title: 'Login Tanpa Password Ribet',
-      body: 'Daftar dengan email, Alamat akun dibuat otomatis. Anda bisa langsung kirim ke alamat yang ada inginkan',
+      title: 'Hassle-Free Passwordless Login',
+      body: 'Sign up with email, your account address is created automatically. You can instantly send to any address you want.',
       tag: 'Custodial-lite',
     },
   ]
@@ -373,9 +372,9 @@ function FeaturesSection() {
       ref={ref as React.RefObject<HTMLElement>}>
       <div className="page-container">
         <div className={`features-header ${inView ? 'anim-in' : ''}`}>
-          <span className="tag">Fitur</span>
+          <span className="tag">Features</span>
           <h2 id="features-heading" className="heading-lg features-header__title">
-            Semua yang Kamu<br />Butuhkan, Satu Tempat
+            Everything You<br />Need, in One Place
           </h2>
         </div>
 
@@ -413,10 +412,10 @@ function HowSection() {
   const { ref, inView } = useInView()
 
   const steps = [
-    { n: '01', actor: '🇲🇾 Pengirim', title: 'Daftar & Top Up', body: 'Buat akun dengan email. Akun anda akan dibuat otomatis dibuat dan memiliki alamat. Isi saldo MYR.' },
-    { n: '02', actor: '🇲🇾 Pengirim', title: 'Tentukan Penerima & Porsi', body: 'Pilih satu atau lebih penerima, atur berapa persen untuk masing-masing. Bisa kirim hingga 5 penerima sekaligus.' },
-    { n: '03', actor: 'Stellar Network', title: 'Settlement Instan', body: 'Transaksi dikirim ke Stellar Network dan selesai dalam &lt;5 detik. Transaksi anda langsung terekam di jaringan stellar dan bisa dicek kapan saja.' },
-    { n: '04', actor: '🇮🇩 Penerima', title: 'Terima & Pilih', body: 'Penerima bisa langsung cairkan ke rekening bank dalam IDR, atau simpan di Blend untuk dapatkan yield.' },
+    { n: '01', actor: '🇲🇾 Sender', title: 'Sign Up & Top Up', body: 'Create an account with email. Your account and address will be automatically generated. Top up your MYR balance.' },
+    { n: '02', actor: '🇲🇾 Sender', title: 'Set Recipients & Portions', body: 'Select one or more recipients and set the percentage for each. You can send to up to 5 recipients at once.' },
+    { n: '03', actor: 'Stellar Network', title: 'Instant Settlement', body: 'Transactions are sent to the Stellar Network and settled in &lt;5 seconds. Your transaction is instantly recorded on the network and can be verified anytime.' },
+    { n: '04', actor: '🇮🇩 Receiver', title: 'Receive & Choose', body: 'Receivers can instantly withdraw to a bank account in IDR, or keep it in Blend to earn yield.' },
   ]
 
   return (
@@ -424,9 +423,9 @@ function HowSection() {
       ref={ref as React.RefObject<HTMLElement>}>
       <div className="page-container">
         <div className={`how-header ${inView ? 'anim-in' : ''}`}>
-          <span className="tag">Cara Kerja</span>
+          <span className="tag">How it Works</span>
           <h2 id="how-heading" className="heading-lg">
-            4 Langkah.<br />1 Transaksi.
+            4 Steps.<br />1 Transaction.
           </h2>
         </div>
 
@@ -446,9 +445,9 @@ function HowSection() {
 
         {/* Final CTA */}
         <div className={`how-cta ${inView ? 'anim-in' : ''}`}>
-          <p className="how-cta__text">Siap coba? Daftar gratis, tidak perlu kartu kredit.</p>
+          <p className="how-cta__text">Ready to try? Sign up for free.</p>
           <Link to="/signup" className="btn-primary how-cta__btn" id="how-cta-signup">
-            Buat Akun Sekarang →
+            Create Account Now →
           </Link>
         </div>
       </div>
@@ -464,28 +463,28 @@ function LandingFooter() {
         <div className="landing-footer__brand">
           <span className="display landing-footer__logo">KIRIM</span>
           <p className="landing-footer__tagline mono">
-            Infrastruktur settlement lintas negara via Stellar Network.
+            Cross-border settlement infrastructure via the Stellar Network.
           </p>
           <p className="landing-footer__compliance">
-            Kirim adalah lapisan teknologi, bukan penerbit alat pembayaran kripto.
-            Penerima selalu menerima Rupiah asli melalui kanal berlisensi.
+            Kirim is a technology layer, not a cryptocurrency issuer.
+            Receivers always receive real Rupiah through licensed channels.
           </p>
         </div>
 
         <div className="landing-footer__links">
           <div className="landing-footer__col">
-            <div className="landing-footer__col-title mono">Produk</div>
-            <a href="#features">Fitur</a>
-            <a href="#how">Cara Kerja</a>
-            <a href="#cost">Perbandingan Biaya</a>
+            <div className="landing-footer__col-title mono">Product</div>
+            <a href="#features">Features</a>
+            <a href="#how">How it Works</a>
+            <a href="#cost">Cost Comparison</a>
           </div>
           <div className="landing-footer__col">
-            <div className="landing-footer__col-title mono">Akun</div>
-            <Link to="/login">Masuk</Link>
-            <Link to="/signup">Daftar Gratis</Link>
+            <div className="landing-footer__col-title mono">Account</div>
+            <Link to="/login">Log In</Link>
+            <Link to="/signup">Sign Up Free</Link>
           </div>
           <div className="landing-footer__col">
-            <div className="landing-footer__col-title mono">Dibangun di atas</div>
+            <div className="landing-footer__col-title mono">Built on</div>
             <a href="https://stellar.org" target="_blank" rel="noreferrer">Stellar Network</a>
             <a href="https://blend.capital" target="_blank" rel="noreferrer">Blend Protocol</a>
           </div>

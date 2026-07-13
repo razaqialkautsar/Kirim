@@ -18,11 +18,11 @@ export function SignUpPage() {
     setError('')
 
     if (password !== confirm) {
-      setError('Password tidak cocok.')
+      setError('Passwords do not match.')
       return
     }
     if (password.length < 8) {
-      setError('Password minimal 8 karakter.')
+      setError('Password must be at least 8 characters.')
       return
     }
 
@@ -31,7 +31,7 @@ export function SignUpPage() {
       await signUp(email, password)
       navigate('/dashboard')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Pendaftaran gagal.')
+      setError(err instanceof Error ? err.message : 'Sign up failed.')
     } finally {
       setLoading(false)
     }
@@ -39,7 +39,7 @@ export function SignUpPage() {
 
   return (
     <div className="auth-layout">
-      {/* Kiri: Form */}
+      {/* Left: Form */}
       <div className="auth-form-panel">
         <div className="auth-form-inner">
           <div className="auth-brand">
@@ -48,20 +48,20 @@ export function SignUpPage() {
           </div>
 
           <div className="auth-header">
-            <h1 className="heading-sm">Buat Akun</h1>
+            <h1 className="heading-sm">Create Account</h1>
             <p className="auth-sub">
-              Daftarkan email kamu — akun Stellar dibuat otomatis, tanpa perlu paham crypto.
+              Register your email. A Stellar account is created automatically, no crypto knowledge required.
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="auth-form" noValidate>
             <div className="form-group">
-              <label htmlFor="signup-email" className="form-label">Alamat Email</label>
+              <label htmlFor="signup-email" className="form-label">Email Address</label>
               <input
                 id="signup-email"
                 type="email"
                 className={`form-input ${error ? 'error' : ''}`}
-                placeholder="kamu@email.com"
+                placeholder="you@email.com"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
@@ -75,7 +75,7 @@ export function SignUpPage() {
                 id="signup-password"
                 type="password"
                 className="form-input"
-                placeholder="Minimal 8 karakter"
+                placeholder="At least 8 characters"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
@@ -84,12 +84,12 @@ export function SignUpPage() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="signup-confirm" className="form-label">Konfirmasi Password</label>
+              <label htmlFor="signup-confirm" className="form-label">Confirm Password</label>
               <input
                 id="signup-confirm"
                 type="password"
-                className={`form-input ${error.includes('cocok') ? 'error' : ''}`}
-                placeholder="Ulangi password"
+                className={`form-input ${error.includes('match') ? 'error' : ''}`}
+                placeholder="Repeat password"
                 value={confirm}
                 onChange={e => setConfirm(e.target.value)}
                 required
@@ -109,35 +109,35 @@ export function SignUpPage() {
               className="btn-primary auth-cta"
               disabled={loading}
             >
-              {loading ? <><span className="spinner" /> Membuat akun...</> : 'Daftar Sekarang'}
+              {loading ? <><span className="spinner" /> Creating account...</> : 'Sign Up Now'}
             </button>
           </form>
 
           <p className="auth-switch">
-            Sudah punya akun?{' '}
-            <Link to="/login" className="auth-link">Masuk</Link>
+            Already have an account?{' '}
+            <Link to="/login" className="auth-link">Log In</Link>
           </p>
         </div>
       </div>
 
-      {/* Kanan: Inverted panel */}
+      {/* Right: Inverted panel */}
       <div className="auth-hero-panel">
         <div className="auth-hero-inner">
-          <div className="auth-hero-tag tag">Kirim untuk PMI</div>
+          <div className="auth-hero-tag tag">Kirim for Migrant Workers</div>
           <h2 className="auth-hero-heading display">
-            Kirim<br />Uang.<br />Detik<br />Ini.
+            Send<br />Money.<br />Right<br />Now.
           </h2>
           <p className="auth-hero-sub">
-            Satu akun. Kirim ke banyak orang sekaligus. Biaya mendekati nol.
+            One account. Send to multiple people at once. Near-zero fees.
           </p>
           <div className="auth-stats">
             <div className="auth-stat">
               <span className="auth-stat-value">{'< 10s'}</span>
-              <span className="auth-stat-label">Waktu kirim</span>
+              <span className="auth-stat-label">Transfer time</span>
             </div>
             <div className="auth-stat">
               <span className="auth-stat-value">~0%</span>
-              <span className="auth-stat-label">Biaya vs 4.8% bank</span>
+              <span className="auth-stat-label">Fee vs 4.8% bank fee</span>
             </div>
           </div>
         </div>
