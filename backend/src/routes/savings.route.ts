@@ -47,19 +47,28 @@ router.get("/", async (req: Request, res: Response) => {
 router.post("/deposit", async (req: Request, res: Response) => {
   try {
     const userId = req.userId!;
-    const { amount } = req.body;
+    const rawAmount = req.body?.amount;
+    const amount = parseFloat(rawAmount);
 
-    if (!amount || typeof amount !== "number") {
+    if (rawAmount === undefined || rawAmount === null || rawAmount === '' || isNaN(amount) || amount <= 0) {
       res.status(400).json({
         error: "Bad Request",
-        message: "Field 'amount' (number) wajib diisi.",
+        message: "Field 'amount' harus diisi dan bernilai angka positif.",
+      });
+      return;
+    }
+
+    if (amount < 0.0000001) {
+      res.status(400).json({
+        error: "Bad Request",
+        message: "Jumlah deposit minimal 0.0000001 TESTUSD.",
       });
       return;
     }
 
     const result = await depositToSavings(userId, amount);
     res.status(201).json({
-      message: `Berhasil deposit ke Blend on-chain.`,
+      message: `Berhasil deposit ${amount} TESTUSD ke Blend on-chain.`,
       data: result,
     });
   } catch (err) {
@@ -77,19 +86,20 @@ router.post("/deposit", async (req: Request, res: Response) => {
 router.post("/withdraw", async (req: Request, res: Response) => {
   try {
     const userId = req.userId!;
-    const { amount } = req.body;
+    const rawAmount = req.body?.amount;
+    const amount = parseFloat(rawAmount);
 
-    if (!amount || typeof amount !== "number") {
+    if (rawAmount === undefined || rawAmount === null || rawAmount === '' || isNaN(amount) || amount <= 0) {
       res.status(400).json({
         error: "Bad Request",
-        message: "Field 'amount' (number) wajib diisi.",
+        message: "Field 'amount' harus diisi dan bernilai angka positif.",
       });
       return;
     }
 
     const result = await withdrawFromSavings(userId, amount);
     res.json({
-      message: `Berhasil menarik dari tabungan.`,
+      message: `Berhasil menarik ${amount} TESTUSD dari tabungan.`,
       data: result,
     });
   } catch (err) {

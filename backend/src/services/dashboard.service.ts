@@ -21,6 +21,7 @@ export interface DashboardData {
     totalDisbursedUSD: number;    // Total TESTUSD yang pernah dikirim ke keluarga
     totalOffRampIDR: number;      // Total IDR yang pernah dicairkan
     totalSavedUSD: number;        // Uang yang dihemat vs bank tradisional
+    totalSavingsUSD: number;      // Total deposit tabungan (Blend)
     traditionalFeePercent: number;
     kirimFeePercent: number;
   };
@@ -150,6 +151,15 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
     return item;
   });
 
+  // --- 4. Ambil saldo tabungan (savings_positions) ---
+  const { data: savingsData } = await supabase
+    .from("savings_positions")
+    .select("amount_deposited")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  const totalSavingsUSD = savingsData ? Number(savingsData.amount_deposited) : 0;
+
   return {
     wallet: walletData
       ? { stellarAddress: walletData.stellar_public_key }
@@ -160,6 +170,7 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
       totalDisbursedUSD: Math.round(totalDisbursedUSD * 100) / 100,
       totalOffRampIDR: Math.round(totalOffRampIDR),
       totalSavedUSD: Math.round(totalSavedUSD * 100) / 100,
+      totalSavingsUSD: Math.round(totalSavingsUSD * 100) / 100,
       traditionalFeePercent: TRADITIONAL_FEE_PERCENT,
       kirimFeePercent: KIRIM_FEE_PERCENT,
     },

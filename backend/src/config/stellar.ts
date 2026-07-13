@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { Horizon, Asset, Networks, rpc, Contract } from "@stellar/stellar-sdk";
+import { Horizon, Asset, Networks, rpc, Contract, Keypair } from "@stellar/stellar-sdk";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 const _sodium = require("libsodium-wrappers");
@@ -51,13 +51,34 @@ if (!testusdIssuerPublicKey) {
 export const TESTUSD_ASSET = new Asset("TESTUSD", testusdIssuerPublicKey);
 
 // ---------------------------------------------------------------------------
-// Asset USDC (Circle Testnet)
+// Asset USDC — Blend Pool Testnet
 // ---------------------------------------------------------------------------
-// Issuer resmi USDC di Stellar Testnet. Digunakan untuk fitur Tabungan Blend.
-export const USDC_ASSET = new Asset(
+// USDC khusus yang digunakan oleh Blend Pool TestnetV2.
+// Issuer: GATALTGTWIOT6BUDBCZM3Q4OQ4BO2COLOAZ7IYSKPLC2PMSOPPGF5V56
+// Ini BERBEDA dari USDC Circle — ini token USDC simulasi milik Blend.
+export const BLEND_USDC_ASSET = new Asset(
   "USDC",
-  "GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5"
+  "GATALTGTWIOT6BUDBCZM3Q4OQ4BO2COLOAZ7IYSKPLC2PMSOPPGF5V56"
 );
+
+// ---------------------------------------------------------------------------
+// Treasury Account (Simulasi DEX Swap)
+// ---------------------------------------------------------------------------
+// Akun ini bertindak sebagai liquidity provider untuk menukar TESTUSD <-> USDC
+// saat user deposit/withdraw ke Blend. Di produksi, ini diganti DEX (Soroswap).
+const treasuryPublicKey = process.env.USDC_DEMO_ACCOUNT_PUBLIC_KEY;
+const treasurySecretKey = process.env.USDC_DEMO_ACCOUNT_SECRET_KEY;
+
+if (!treasuryPublicKey || !treasurySecretKey) {
+  console.warn(
+    "⚠️  USDC_DEMO_ACCOUNT keys belum diisi di .env — fitur Treasury Swap tidak aktif."
+  );
+}
+
+export const treasuryKeypair = treasurySecretKey
+  ? Keypair.fromSecret(treasurySecretKey)
+  : null;
+export const treasuryPublic = treasuryPublicKey ?? "";
 
 // ---------------------------------------------------------------------------
 // Enkripsi / Dekripsi Secret Key Stellar

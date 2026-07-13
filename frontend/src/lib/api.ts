@@ -70,6 +70,7 @@ export interface DashboardData {
     totalDisbursedUSD: number
     totalOffRampIDR: number
     totalSavedUSD: number
+    totalSavingsUSD: number
     traditionalFeePercent: number
     kirimFeePercent: number
   }

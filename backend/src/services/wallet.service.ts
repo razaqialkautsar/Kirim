@@ -49,7 +49,7 @@ export async function provisionStellarAccount(userId: string): Promise<string> {
   // Akun Stellar baru secara default hanya bisa memegang XLM.
   // Agar bisa menerima TESTUSD dan USDC, kita harus membuat transaksi 'ChangeTrust'
   console.log(`[wallet] Membuat trustline untuk TESTUSD dan USDC...`);
-  const { server, TESTUSD_ASSET, USDC_ASSET, NETWORK_PASSPHRASE } = await import("../config/stellar.js");
+  const { server, TESTUSD_ASSET, BLEND_USDC_ASSET, NETWORK_PASSPHRASE } = await import("../config/stellar.js");
   const { TransactionBuilder, Operation, BASE_FEE } = await import("@stellar/stellar-sdk");
   
   const account = await server.loadAccount(publicKey);
@@ -64,7 +64,7 @@ export async function provisionStellarAccount(userId: string): Promise<string> {
     )
     .addOperation(
       Operation.changeTrust({
-        asset: USDC_ASSET,
+        asset: BLEND_USDC_ASSET,
       })
     )
     .setTimeout(30)

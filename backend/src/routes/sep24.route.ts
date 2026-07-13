@@ -83,10 +83,12 @@ router.post(
   authMiddleware,
   async (req: Request, res: Response) => {
     try {
-      const { bankCode, accountNumber, accountName, amountTESTUSD } = req.body;
+      const { bankCode, accountNumber, accountName } = req.body;
+      const rawAmount = req.body?.amountTESTUSD;
+      const amountTESTUSD = typeof rawAmount === "number" ? rawAmount : parseFloat(rawAmount);
 
       // Validasi keberadaan field wajib
-      if (!bankCode || !accountNumber || !accountName || !amountTESTUSD) {
+      if (!bankCode || !accountNumber || !accountName || rawAmount === undefined || rawAmount === null) {
         res.status(400).json({
           error: "Bad Request",
           message:
@@ -96,7 +98,7 @@ router.post(
       }
 
       // Validasi tipe data amountTESTUSD
-      if (typeof amountTESTUSD !== "number" || amountTESTUSD <= 0) {
+      if (isNaN(amountTESTUSD) || amountTESTUSD <= 0) {
         res.status(400).json({
           error: "Bad Request",
           message: "amountTESTUSD harus berupa angka positif.",

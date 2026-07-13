@@ -22,7 +22,7 @@ async function run() {
       const account = await server.loadAccount(keypair.publicKey());
       
       const hasTrustline = account.balances.some(
-        (b) => b.asset_code === BLEND_USDC_ASSET.code && b.asset_issuer === BLEND_USDC_ASSET.issuer
+        (b: any) => b.asset_code === BLEND_USDC_ASSET.code && b.asset_issuer === BLEND_USDC_ASSET.issuer
       );
 
       if (hasTrustline) {

@@ -33,12 +33,13 @@ const router = Router();
  */
 router.post("/simulate", authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { amountMYR } = req.body;
+    const rawAmountMYR = req.body?.amountMYR;
+    const amountMYR = typeof rawAmountMYR === "number" ? rawAmountMYR : parseFloat(rawAmountMYR);
 
-    if (!amountMYR || typeof amountMYR !== "number") {
+    if (rawAmountMYR === undefined || rawAmountMYR === null || isNaN(amountMYR) || amountMYR <= 0) {
       res.status(400).json({
         error: "Bad Request",
-        message: "Field 'amountMYR' wajib diisi dan harus berupa angka.",
+        message: "Field 'amountMYR' wajib diisi dan harus berupa angka positif.",
       });
       return;
     }

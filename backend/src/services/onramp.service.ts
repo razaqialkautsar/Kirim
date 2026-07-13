@@ -3,13 +3,14 @@ import {
   TransactionBuilder,
   Operation,
   BASE_FEE,
+  Asset,
 } from "@stellar/stellar-sdk";
 import { supabase } from "../config/supabase.js";
 import {
   server,
   NETWORK_PASSPHRASE,
   TESTUSD_ASSET,
-  USDC_ASSET,
+  BLEND_USDC_ASSET,
 } from "../config/stellar.js";
 import { getWalletByUserId } from "./wallet.service.js";
 import { emitToUser } from "../config/socket.js";
@@ -106,7 +107,7 @@ export async function simulateOnRamp(
       Operation.payment({
         source: usdcFaucetKeypair.publicKey(),
         destination: senderWallet.stellar_public_key,
-        asset: USDC_ASSET,
+        asset: Asset.native(),
         amount: "10.0000000",
       })
     )

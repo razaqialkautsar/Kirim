@@ -391,7 +391,7 @@ function CairkanTab({ onSuccess }: { onSuccess: () => void }) {
 }
 
 // ─── Tab: Tabungan Blend ──────────────────────────────────────────────────
-function TabunganTab({ addToast }: { addToast: (msg: string, type: Toast['type']) => void }) {
+function TabunganTab({ addToast, onSuccess }: { addToast: (msg: string, type: Toast['type']) => void, onSuccess: () => void }) {
   const [position, setPosition] = useState<SavingsPosition | null>(null)
   const [loadingPos, setLoadingPos] = useState(true)
   const [depositAmount, setDepositAmount] = useState('')
@@ -429,8 +429,10 @@ function TabunganTab({ addToast }: { addToast: (msg: string, type: Toast['type']
       const res = await kirimApi.depositToSavings(Number(depositAmount))
       addToast(`✅ Deposit ${depositAmount} TESTUSD to Blend successful!`, 'success')
       setDepositAmount('')
-      // Force refresh
+      // Force refresh tabungan
       await fetchSavings()
+      // Refresh balance di dashboard utama
+      onSuccess()
       console.log('[savings] deposit berhasil:', res.data.stellarTxHash)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Deposit failed.')
@@ -448,6 +450,7 @@ function TabunganTab({ addToast }: { addToast: (msg: string, type: Toast['type']
       addToast(`💰 Withdrawal of ${withdrawAmount} TESTUSD successful!`, 'info')
       setWithdrawAmount('')
       await fetchSavings()
+      onSuccess()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Withdrawal failed.')
     } finally {
@@ -712,7 +715,7 @@ export function DashboardPage() {
 
   // Hitung balance estimasi dari metrics
   const balance = data?.metrics
-    ? (data.metrics.totalOnRampMYR * 0.22 - data.metrics.totalDisbursedUSD - data.metrics.totalOffRampIDR / 15800).toFixed(2)
+    ? (data.metrics.totalOnRampMYR * 0.22 - data.metrics.totalDisbursedUSD - data.metrics.totalOffRampIDR / 15800 - data.metrics.totalSavingsUSD).toFixed(2)
     : '–'
 
   return (
@@ -822,7 +825,7 @@ export function DashboardPage() {
 
             {tab === 'kirim' && <KirimTab onSuccess={fetchDashboard} />}
             {tab === 'cairkan' && <CairkanTab onSuccess={fetchDashboard} />}
-            {tab === 'tabungan' && <TabunganTab addToast={addToast} />}
+            {tab === 'tabungan' && <TabunganTab addToast={addToast} onSuccess={fetchDashboard} />}
             {tab === 'riwayat' && (
               loadingData
                 ? <div style={{ padding: 40, textAlign: 'center' }}><span className="spinner" /></div>
