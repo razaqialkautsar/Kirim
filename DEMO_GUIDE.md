@@ -71,7 +71,7 @@ Saat mempresentasikan aplikasi Kirim, ikuti alur skenario berikut agar juri dapa
 
 ### Langkah A: Login & Registrasi Otomatis
 - Gunakan fitur Auth yang ada (bisa mendaftar akun baru dengan email fiktif atau gunakan akun yang sudah ada).
-- **Poin Demo:** Jelaskan bahwa aplikasi ini membuatkan *wallet* Stellar secara otomatis di latar belakang. Pengguna tidak perlu repot menyimpan 24-word *seed phrase* (konsep *Account Abstraction*).
+- **Poin Demo:** Jelaskan bahwa aplikasi ini membuatkan *wallet* Stellar secara otomatis di latar belakang. Pengguna tidak perlu repot menyimpan 24-word *seed phrase* (konsep *Custodial-lite wallet*).
 
 ### Langkah B: Top Up (On-Ramp)
 - Buka **Tab Top Up** (ikon panah bawah di *sidebar*).
