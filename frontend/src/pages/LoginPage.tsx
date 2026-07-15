@@ -32,7 +32,7 @@ export function LoginPage() {
       <div className="auth-form-panel">
         <div className="auth-form-inner">
           <div className="auth-brand">
-            <span className="auth-logo">KIRIM</span>
+            <img src="/logokirimblack.png" alt="Kirim" className="auth-logo" />
             <span className="tag">TESTNET</span>
           </div>
 

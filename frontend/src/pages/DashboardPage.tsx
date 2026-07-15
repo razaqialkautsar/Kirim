@@ -725,7 +725,7 @@ export function DashboardPage() {
 
       {/* ── Top Nav ── */}
       <nav className="dashboard-nav">
-        <span className="dashboard-brand">KIRIM</span>
+        <img src="/logokirimblack.png" alt="Kirim" className="dashboard-brand" />
         <div className="dashboard-nav-right">
           <span className="dashboard-user mono">{user?.email}</span>
           <button id="logout-btn" className="btn-ghost" onClick={handleLogout}>Log Out</button>

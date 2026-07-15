@@ -461,7 +461,7 @@ function LandingFooter() {
     <footer className="landing-footer" role="contentinfo">
       <div className="page-container landing-footer__inner">
         <div className="landing-footer__brand">
-          <span className="display landing-footer__logo">KIRIM</span>
+          <img src="/logokirimwhite.png" alt="Kirim" className="landing-footer__logo" />
           <p className="landing-footer__tagline mono">
             Cross-border settlement infrastructure via the Stellar Network.
           </p>

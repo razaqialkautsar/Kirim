@@ -31,12 +31,9 @@
 }
 
 .auth-logo {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 28px;
-  letter-spacing: -0.5px;
-  text-transform: uppercase;
-  line-height: 1;
+  height: 32px;
+  width: auto;
+  display: block;
 }
 
 .auth-header {

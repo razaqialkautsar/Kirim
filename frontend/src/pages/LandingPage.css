@@ -734,8 +734,10 @@ section:nth-of-type(even) {
 }
 
 .landing-footer__logo {
-  font-size: 56px;
-  color: var(--color-paper-white);
+  height: 40px;
+  width: auto;
+  display: block;
+  align-self: flex-start;
 }
 
 .landing-footer__tagline {
